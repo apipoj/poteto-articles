@@ -6,7 +6,7 @@
 
 A small "software factory": one supervising agent (we call it the orchestrator, or "first mate") that takes in work, assigns it to worker agents, watches their output, and merges what's good. The goal was the same one poteto describes — get an agent to verify its own work well enough that a human doesn't have to be the bottleneck on every change — and then stack supervision and dispatch on top of that so the factory could run mostly unattended.
 
-We didn't reinvent verification, review gating, or worktree isolation; all of that is pstack. What we added is the layer above it: an orchestrator that decides *what* work happens, *who* does it, and *whether it's good enough to ship*, so a small team can run several agents at once without babysitting each one.
+pstack gave us the verification method (`create-verification-skill` and `maintain-verification-skill`) and the rigor playbooks; the isolated worktree per worker and the validation pipeline with a cross-family reviewer come from our own orchestration tooling. What we added is the layer above pstack: an orchestrator that decides *what* work happens, *who* does it, and *whether it's good enough to ship*, so a small team can run several agents at once without babysitting each one.
 
 ## Architecture
 
