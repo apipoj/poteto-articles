@@ -1,6 +1,6 @@
 # Factory runbook: setting up your own software factory
 
-*Our own notes, not poteto's writing. A companion to [Our software factory](our-software-factory.md) (the concept and architecture) — this is the how-to. Read [How I Use Cursor](../how-i-use-cursor.md), [The Complete Guide to pstack Pt. 1](../the-complete-guide-to-pstack-pt-1.md), and [The Complete Guide to pstack Pt. 2](../the-complete-guide-to-pstack-pt-2.md) first if you haven't; this runbook assumes their vocabulary (verification skills, the "three-minute egg", worker/orchestrator).*
+*Our own notes, not poteto's writing. A companion to [Our software factory](contract.md) (the concept and architecture) — this is the how-to. Read [How I Use Cursor](../references/poteto/how-i-use-cursor.md), [The Complete Guide to pstack Pt. 1](../references/poteto/the-complete-guide-to-pstack-pt-1.md), and [The Complete Guide to pstack Pt. 2](../references/poteto/the-complete-guide-to-pstack-pt-2.md) first if you haven't; this runbook assumes their vocabulary (verification skills, the "three-minute egg", worker/orchestrator).*
 
 This is written so an agent — another Claude Code session, another firstmate instance, whatever — can pick it up on a fresh machine with a fresh repo and stand up its own, **separate** factory: its own orchestrator, its own workers, its own projects. Nothing here wires you into anyone else's factory. If you're a human handing this off, the agent should be able to follow it with minimal supervision; check in at the "needs-decision" points called out below.
 
@@ -200,7 +200,7 @@ Rules to follow:
 Per project, three things:
 
 1. **Register it with firstmate**: delivery mode (direct-PR vs. no-mistakes-piloted) and whether auto-merge is on. Auto-merge should only ever be on for projects where the validation pipeline (see below) is trusted and where nothing in scope is a release, deploy, or destructive/security-sensitive change.
-2. **Build the project's verification skill**, following pstack's `create-verification-skill` method: a disposable database and app instance, seeded demo roles, scripted UI driving end-to-end (Playwright or equivalent), screenshots and video captured as it runs, a Feature Map of the app's surface area, and a JSON-emitting CLI so both humans and agents can invoke it and parse the result. This is the thing every worker's output has to clear before it's considered done — see the "Verification is still the bottleneck" section of [Our software factory](our-software-factory.md) for why it matters.
+2. **Build the project's verification skill**, following pstack's `create-verification-skill` method: a disposable database and app instance, seeded demo roles, scripted UI driving end-to-end (Playwright or equivalent), screenshots and video captured as it runs, a Feature Map of the app's surface area, and a JSON-emitting CLI so both humans and agents can invoke it and parse the result. This is the thing every worker's output has to clear before it's considered done — see the "Verification is still the bottleneck" section of [Our software factory](contract.md) for why it matters.
 3. **Add one line to the project's `AGENTS.md`** requiring runtime evidence (screenshots/video from the verification skill, not just "tests pass") in every PR. One line — resist the urge to also document the verification skill's internals there; that belongs in the skill itself, not in the file every agent session loads.
 
 ## 6. Intake
@@ -275,7 +275,7 @@ These are the guardrails that make unattended operation safe:
 
 ## 9. Lessons from day one
 
-Short version of what actually went wrong on our first run (longer version in [Our software factory](our-software-factory.md#what-the-first-day-actually-looked-like)):
+Short version of what actually went wrong on our first run (longer version in [Our software factory](contract.md#what-the-first-day-actually-looked-like)):
 
 - **Two workers on the same model got stuck in visible thinking loops on the same task.** Swapping in a different model in the same worktree unstuck both immediately — don't waste turns re-prompting a looping worker.
 - **A single large feature took four rounds of independent review before it was mergeable.** Split big features into smaller PRs up front; review rounds scale with surface area, not effort.

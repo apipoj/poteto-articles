@@ -1,0 +1,12 @@
+---
+description: Software factory kit — always load AGENTS.md first
+alwaysApply: true
+---
+
+This repository is a software-factory kit for any AI coding harness.
+
+1. Read `AGENTS.md` first.
+2. Then `factory/contract.md` and `factory/runbook.md` as needed for the task.
+3. Use the Cursor adapter at `adapters/cursor.md`.
+4. Poteto / pstack source articles live under `references/poteto/` — foundational reading, not the operating contract.
+5. Do not treat this repo as an application codebase.

@@ -1,6 +1,6 @@
 # Our software factory
 
-*Our own notes, not poteto's writing. Inspired by and building on [How I Use Cursor](../how-i-use-cursor.md), [The Complete Guide to pstack Pt. 1](../the-complete-guide-to-pstack-pt-1.md), and [The Complete Guide to pstack Pt. 2](../the-complete-guide-to-pstack-pt-2.md) — read those first; this is a companion write-up of what we actually built, over one weekend (2026-09-25/26), by applying their ideas.*
+*Our own notes, not poteto's writing. Inspired by and building on [How I Use Cursor](../references/poteto/how-i-use-cursor.md), [The Complete Guide to pstack Pt. 1](../references/poteto/the-complete-guide-to-pstack-pt-1.md), and [The Complete Guide to pstack Pt. 2](../references/poteto/the-complete-guide-to-pstack-pt-2.md) — read those first; this is a companion write-up of what we actually built, over one weekend (2026-09-25/26), by applying their ideas.*
 
 ## What we built
 

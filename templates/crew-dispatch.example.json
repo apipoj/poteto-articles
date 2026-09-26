@@ -1,0 +1,122 @@
+{
+ "rules": [
+  {
+   "when": "The task's project is a Next.js app, for any kind of crewmate or scout work. This project-based rule outranks the task-type rules below; the only exception is image generation.",
+   "use": {
+    "harness": "pi",
+    "model": "router/gcli/grok-4.7",
+    "effort": "high",
+    "provider": "grok"
+   },
+   "why": "Captain (2026-09-25)"
+  },
+  {
+   "when": "The task is new feature development with no PRD and no existing plan.",
+   "use": {
+    "harness": "claude",
+    "model": "opus",
+    "effort": "xhigh"
+   },
+   "why": "Captain (2026-09-25)"
+  },
+  {
+   "when": "The task requires generating images.",
+   "use": {
+    "harness": "codex",
+    "model": "gpt-6-sol"
+   },
+   "why": "Captain (2026-09-25)"
+  },
+  {
+   "when": "The task is technical product design, architecture, or planning. Do not dispatch until the captain approves the chosen profile for this task.",
+   "use": [
+    {
+     "harness": "claude",
+     "model": "opus",
+     "effort": "xhigh"
+    },
+    {
+     "harness": "pi",
+     "model": "router/kimi/kimi-k3",
+     "effort": "xhigh",
+     "provider": "kimi"
+    },
+    {
+     "harness": "pi",
+     "model": "router/cx/gpt-6-astra",
+     "effort": "xhigh",
+     "provider": "codex"
+    }
+   ],
+   "why": "Captain (2026-09-25)"
+  },
+  {
+   "when": "The task is a simple, well-defined bug fix.",
+   "use": [
+    {
+     "harness": "pi",
+     "model": "router/cx/gpt-6-luna",
+     "effort": "max",
+     "provider": "codex"
+    },
+    {
+     "harness": "pi",
+     "model": "router/glm/glm-5.3-flash",
+     "provider": "zai"
+    },
+    {
+     "harness": "pi",
+     "model": "router/ds/deepseek-flash",
+     "provider": "deepseek"
+    },
+    {
+     "harness": "pi",
+     "model": "router/gcli/grok-4.7",
+     "provider": "grok"
+    },
+    {
+     "harness": "claude",
+     "model": "sonnet"
+    }
+   ],
+   "why": "Captain (2026-09-25)"
+  },
+  {
+   "when": "The task is implementing, refreshing, or shipping an already-specified feature: an existing issue, PR, or written plan. Not greenfield without a PRD, not architecture-only planning, and not a simple bug fix.",
+   "use": [
+    {
+     "harness": "pi",
+     "model": "router/cx/gpt-6-luna",
+     "effort": "max",
+     "provider": "codex"
+    },
+    {
+     "harness": "pi",
+     "model": "router/glm/glm-5.3-flash",
+     "effort": "max",
+     "provider": "zai"
+    }
+   ],
+   "why": "Captain (2026-09-25)"
+  }
+ ],
+ "default": [
+  {
+   "harness": "pi",
+   "model": "router/cx/gpt-6-luna",
+   "effort": "max",
+   "provider": "codex"
+  },
+  {
+   "harness": "pi",
+   "model": "router/glm/glm-5.3-flash",
+   "effort": "max",
+   "provider": "zai"
+  },
+  {
+   "harness": "pi",
+   "model": "router/gcli/grok-4.7",
+   "provider": "grok"
+  }
+ ]
+}
