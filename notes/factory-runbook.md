@@ -207,7 +207,7 @@ Per project, three things:
 
 Work enters the factory as a GitHub issue carrying a `factory` label. Create that label in each pilot repo before wiring intake up.
 
-Save the poll script as `state/factory-intake.check.sh` under your firstmate home ($FM_HOME) and register it as a firstmate custom check with firstmate's `check-register` helper (adjust `REPOS` to your pilot repos):
+Save the poll script as `state/factory-intake.check.sh` under your firstmate home and register it as a firstmate custom check with firstmate's `check-register` helper (adjust `REPOS` to your pilot repos). Firstmate custom checks do not reliably inherit `$FM_HOME` from the environment they run in, so hardcode the absolute path at the top of the script rather than relying on the variable being set for you:
 
 ```bash
 #!/usr/bin/env bash
@@ -215,7 +215,8 @@ Save the poll script as `state/factory-intake.check.sh` under your firstmate hom
 # Prints one line per newly `factory`-labelled open issue in the pilot repos,
 # and nothing otherwise. Seen issue keys live in state/.factory-intake-seen.
 set -u
-STATE_DIR=$FM_HOME/state
+FM_HOME_DIR=/absolute/path/to/your/firstmate/home  # edit this — checks may not inherit $FM_HOME
+STATE_DIR="$FM_HOME_DIR/state"
 SEEN="$STATE_DIR/.factory-intake-seen"
 REPOS="<owner>/<repo>"
 touch "$SEEN" 2>/dev/null || exit 0
@@ -238,17 +239,19 @@ On every wake where this check fires, the orchestrator: reads the newly-flagged 
 
 ## 7. Daily verification maintenance
 
-Verification skills rot as apps grow — new routes and features need new Feature Map entries and new scripted checks. Save this as `state/verify-maintain.check.sh` and register it the same way, with `check-register`, as a second daily trigger:
+Verification skills rot as apps grow — new routes and features need new Feature Map entries and new scripted checks. Save this as `state/verify-maintain.check.sh` and register it the same way, with `check-register`, as a second daily trigger. Same caveat as above: firstmate custom checks do not reliably inherit `$FM_HOME`, so hardcode the absolute path.
 
 ```bash
 #!/usr/bin/env bash
 # Daily verify-<app> maintenance trigger.
-# Prints one line once per Bangkok calendar day at or after 09:00 local, and
-# nothing otherwise. The last-fired day lives in state/.verify-maintain-last.
+# Prints one line once per calendar day (in TZ_NAME) at or after 09:00 local,
+# and nothing otherwise. The last-fired day lives in state/.verify-maintain-last.
 set -u
-LAST=$FM_HOME/state/.verify-maintain-last
-today=$(TZ=Asia/Bangkok date +%F)
-hour=$(TZ=Asia/Bangkok date +%H)
+FM_HOME_DIR=/absolute/path/to/your/firstmate/home  # edit this — checks may not inherit $FM_HOME
+TZ_NAME=Asia/Bangkok  # edit this — pick your own timezone
+LAST="$FM_HOME_DIR/state/.verify-maintain-last"
+today=$(TZ="$TZ_NAME" date +%F)
+hour=$(TZ="$TZ_NAME" date +%H)
 [ "$hour" -ge 9 ] || exit 0
 [ "$(cat "$LAST" 2>/dev/null)" = "$today" ] && exit 0
 printf '%s\n' "$today" > "$LAST" || exit 0
