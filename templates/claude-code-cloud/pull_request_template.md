@@ -4,9 +4,14 @@ Fixes #
      and edit the Risk list to the areas where your project needs human sign-off.
      Delete the Fixes line if there is no issue. Comments like this one are hidden. -->
 
-## Why
+## Intent
 
-<!-- The problem in 1–3 sentences. Bug: the root cause, not the symptom. -->
+<!-- What this change is for, in 1–3 sentences (bug: the root cause, not the symptom), then the
+     scenarios that prove it works. Each scenario appears again under Live validation. -->
+
+Scenarios:
+
+-
 
 ## Change
 
@@ -26,7 +31,15 @@ Run `<run-id>`, commit `<sha>`:
 # the exact <verify-skill> commands you ran
 ```
 
-- Result:
+### Live validation
+
+<!-- One row per Intent scenario. Result: ✅ pass / ❌ fail / ⏸️ untested. Live: "live" only when
+     the scenario was driven in the running app; unit tests are "no". Untested or not-live rows say
+     why in Evidence. -->
+
+| Scenario | Result | Live | Evidence |
+| --- | --- | --- | --- |
+|  |  |  |  |
 
 <!-- Screenshots: ![what it shows](link). Factory workers: link images by commit SHA (see worker brief). -->
 
@@ -47,6 +60,11 @@ This PR touches (check all that apply):
 - [ ] None of the above
 
 Blast radius: <!-- who or what breaks if this is wrong -->
+
+## Needs owner decision
+
+<!-- Questions the issue does not settle and that change what the product does. Don't guess: list
+     them here, open the PR as a draft, and ask on the issue. Write "None" when there are none. -->
 
 ## Noticed, not fixed
 

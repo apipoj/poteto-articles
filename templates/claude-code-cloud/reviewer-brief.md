@@ -17,6 +17,10 @@ have checked it yourself. Judge the diff, not the author's explanation of it.
    - Every section is answered; none is deleted or left as the placeholder.
    - **Evidence** has real `<verify-skill>` commands, results, and screenshots for any behaviour or
      UI change. "Tests pass" alone is not evidence.
+   - **Live validation** covers every Intent scenario. A behaviour scenario marked `Live: no` or
+     `⏸️ untested` without a good reason is blocking. Re-drive at least one `live` row yourself.
+   - **Needs owner decision** is "None", or the PR is a draft and the question is on the issue.
+     Don't answer product questions for the owner.
    - **Risk** boxes match the diff: open the changed files and check that each area the diff touches
      is ticked. A ticked auth, money, or migration box means a human must sign off; say so.
    - User-facing text changed in every supported language.
