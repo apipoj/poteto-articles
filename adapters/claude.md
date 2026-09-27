@@ -23,4 +23,6 @@ Running the whole factory on Claude Code on the web (Claude models only, no firs
 ## Dispatch tips
 
 - Strong fit: greenfield features without a PRD, architecture/planning (after captain profile approval), deep refactors.
-- Prefer high-effort Opus-class profiles for planning; Sonnet-class for well-specified bugs when dispatch rules say so.
+- Planning still fits an Opus-class profile, and a well-specified bug still fits Sonnet-class, when the dispatch rule says so. That choice is the model. Effort is separate.
+- Levels and the escalate loop are in [templates/effort.md](../templates/effort.md). In Claude Code, set the level with `/effort` followed by `low`, `medium`, `high`, `xhigh`, or `max`. Launch flags and `CLAUDE_CODE_EFFORT_LEVEL` are the local equivalents. `max` stays on for one session unless the environment variable sets it. Clear it before the next task.
+- `/model` changes the model. `/effort` changes how much verification that same model does. After a model swap, start again at the new profile's effort. Do not keep `max` from the previous model.

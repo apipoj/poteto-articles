@@ -26,7 +26,20 @@ It can run alongside a firstmate factory on the same repo; see "Coexisting with 
 1. **Cross-model, not cross-family, review.** With Claude only, the reviewer is a different Claude
    model from the author, in a fresh session with no author context. Same-lineage models can share
    blind spots, so keep a human merge unless you add a non-Claude reviewer.
-2. **No `effort` in dispatch.** `create_session` takes a model, not an effort level.
+2. **`create_session` takes `model`.** The call in
+   [orchestrator.md](../templates/claude-code-cloud/orchestrator.md) passes `source_url`,
+   `outcome_branch`, `model`, `tags`, `title`, and `prompt`. A replacement also passes
+   `source_revision`. Checked 2026-09-27 against that call and against public Claude Code docs.
+   That call has no `effort` argument. The Messages API field `output_config.effort` is a
+   different surface. Do not add `effort` to `create_session`.
+   Inside a session, set the level with `/effort` and a level name, for example `/effort high`.
+   Web and mobile clients accept that argument form. See
+   [Remote Control](https://code.claude.com/docs/en/remote-control). If this cloud session rejects
+   `/effort`, say so on the issue and keep the session default.
+   Copy [templates/effort.md](../templates/effort.md) to `docs/factory/effort.md`. A chain retry
+   swaps `model`. It does not raise effort. After a swap, start at the level in `effort.md` for
+   this task. Raise effort when the approach is right and verification is thin. Swap the model
+   when the worker repeats the same plan.
 3. **Workers own delivery.** No separate pipeline exists, so the worker opens its PR and drives it
    green. It never merges, tags, deploys, or touches production.
 4. **Lower concurrency.** Start at 3 workers: each is a container plus model spend.
