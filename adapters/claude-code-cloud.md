@@ -11,8 +11,8 @@ It can run alongside a firstmate factory on the same repo; see "Coexisting with 
 
 | Kit piece | Claude Code cloud |
 | --- | --- |
-| Claude Code Environment | Named **`factory-cloud`**. Routines for this kit start every session in that Environment |
-| Orchestrator (firstmate) | A **Routine** that fires hourly into a persistent orchestrator session created with the repo attached (Environment `factory-cloud`) and runs one orchestrator pass ([orchestrator.md](../templates/claude-code-cloud/orchestrator.md)) |
+| Claude Code Environment | **One per project** (e.g. `timeflow`). The orchestrator and maintenance sessions are created in it, and every worker and reviewer inherits it |
+| Orchestrator (firstmate) | A **Routine** that fires hourly into a persistent orchestrator session created with the repo attached and runs one orchestrator pass ([orchestrator.md](../templates/claude-code-cloud/orchestrator.md)), in the project's Environment |
 | `factory-intake.check.sh` + `gh` | The orchestrator lists issues labeled `factory-cloud` with the **GitHub MCP tools** (cloud sessions have no `gh`) |
 | `state/.factory-intake-seen` | `<!-- factory:... -->` **marker comments** on the issue. The `factory:` prefix is a shared protocol marker, not the Environment name. Each Routine firing is a fresh container, so state must live on GitHub |
 | Worker in an isolated worktree | One **cloud session per issue** (`create_session`, `outcome_branch: factory-cloud/issue-<N>`). The container is the isolation |
@@ -47,7 +47,25 @@ It can run alongside a firstmate factory on the same repo; see "Coexisting with 
 
 ## Environment setup
 
-Name the Claude Code Environment `factory-cloud`. Routines for this kit start every session in that Environment.
+Give each project its **own Claude Code Environment** (named after the project, e.g. `timeflow`).
+Don't share the `Default` one, or one environment across projects:
+
+- **Secrets and environment variables leak across projects.** Anything added to a shared
+  environment for project A is visible to every factory worker of project B.
+- **One project's changes break another's factory.** Tightening a shared environment's network
+  policy or setup script for one project can silently stop another project's workers.
+- Keep the factory's environment free of production secrets: workers need only GitHub (through
+  the connected tools) and a disposable local database.
+
+Sessions inherit the environment of the session that creates them. So create the orchestrator and
+maintenance sessions with `environment_id` set to the project's environment (look it up with
+`list_environments`; a person creates the environment on claude.ai). Every worker and reviewer the
+orchestrator spawns then lands there without further configuration.
+
+**Moving an existing factory to a new environment:** create new orchestrator and maintenance
+sessions in it (run a no-write setup check in each first: GitHub read, and the SessionStart hook's
+database), then create new Routines pointing at them and disable the old ones. `update_trigger`
+cannot repoint a Routine to another session. Workers already running finish where they are.
 
 Put setup in a **repo SessionStart hook** ([session-start.sh](../templates/claude-code-cloud/session-start.sh)
 + [settings.json](../templates/claude-code-cloud/settings.json)), not only in the environment's setup
@@ -97,6 +115,18 @@ What we found on a real cloud container (Sept 2026):
   markers on the issues). You may not be able to read a fired session's transcript, so judge it by
   what it wrote.
 
+## Monitoring page (optional)
+
+A private claude.ai page (an Artifact) gives the owner one place to watch the factory. The page
+**cannot call Claude Code Remote** (it is not a connector a page can use), and it only reads GitHub
+if the owner has a GitHub connector on claude.ai. So have the orchestrator write a snapshot at the
+end of each pass instead: one `ArtifactData` `set` of a single document (issues with hold reasons,
+open factory PRs with CI and review state, agents from `list_sessions`, the two Routines from
+`get_trigger`, the 5-hour limit from `get_session`'s `rate_limit_info`, and a "needs you" list).
+The page subscribes to that document, so it updates when the pass lands, and flags the snapshot as
+stale when it is over 2 hours old. Declare the page's database with root `write: "admin"`, so only
+the owner (and Claude, acting as the owner) writes it.
+
 ## Issue conventions (firstmate-style issues)
 
 Issues written for firstmate carry `Kind:`, `Gate:` (`held`, `hard GO`, `soft GO`, conditional),
@@ -136,8 +166,9 @@ Firstmate polls the label `factory`. This cloud factory polls `factory-cloud`. T
 3. Create the GitHub intake label `factory-cloud`.
 4. Create the orchestrator and maintenance sessions with the repo attached, then the two Routines
    (hourly intake, daily maintenance) pointing at them with the prompts at the end of
-   [orchestrator.md](../templates/claude-code-cloud/orchestrator.md). Ask a cloud session in the
-   Environment named `factory-cloud` to do all four; no claude.ai UI step is needed.
+   [orchestrator.md](../templates/claude-code-cloud/orchestrator.md), both sessions in the
+   project's own Environment (a person creates it on claude.ai first). Any cloud session can do the
+   rest with `create_session` (`environment_id`) and `create_trigger`.
 5. Dry-run one orchestrator pass by hand (no writes) against the open issues, then fire the intake
    Routine once and check the hold markers it posts. Label one small issue and watch the first real
    pass before leaving it unattended.
