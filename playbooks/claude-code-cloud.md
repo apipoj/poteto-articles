@@ -55,7 +55,7 @@ Expect one sitting to set it up, then a day of light watching before you leave i
    `.claude/`; `pull_request_template.md` into `.github/`. Point `CLAUDE.md` at `docs/factory/` in
    one line.
 2. Fill the placeholders:
-   - `<owner>/<repo>`, `<verify-skill>`, `<cap>`;
+   - `<owner>/<repo>`, `<verify-skill>`, `<check command>`, `<cap>`, `<floor rules>`;
    - `<operator-session-id>`, only if relayed GO is on;
    - `<monitor-url>` and the two trigger ids after phase 3, or delete the monitor paragraph.
 3. Write the project's floor rules into the worker and reviewer briefs: the few things v1 must
@@ -161,6 +161,8 @@ Open a Claude Code cloud session on the new repo, in its own environment, and pa
 > Set up the Claude-only cloud software factory for `<owner>/<repo>`, following
 > `apipoj/software-factory` `playbooks/claude-code-cloud.md` phases 1 to 3. Use environment
 > `<environment name>`. Model policy: `<kit default | all development on Opus>`. Worker cap:
-> `<n>`. Relayed GO in chat: `<yes | no>`. Monitor page: `<yes | no>`. Work through PRs, merge
-> your own green docs and CI PRs, and ask me only for what is human-only. Finish with a first pass
-> on the open `factory-cloud` issues and tell me what needs my GO.
+> `<n>`. Review: `<cross-model | same model + second review on risky PRs (Fable)>`. Floor rules:
+> `<the few things v1 must never break>`. Relayed GO in chat: `<yes | no>`. Monitor page:
+> `<yes | no>`. Work through PRs, merge your own green docs and CI PRs, and ask me only for what
+> is human-only. Finish with a first pass on the open `factory-cloud` issues and tell me what
+> needs my GO.

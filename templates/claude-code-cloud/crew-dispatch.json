@@ -48,11 +48,19 @@
   { "model": "claude-opus-5-5" }
  ],
  "review": {
-  "when": "Every factory PR. Pick the first model in this list that differs from the model that authored the PR's latest commits.",
+  "when": "Every factory PR. Pick the first model in this list that differs from the model that authored the PR's latest commits. (Alternative policy: set this to 'the first model in this list, even when it wrote the PR' and rely on the strict reviewer brief plus second_review.)",
   "use": [
    { "model": "claude-opus-5-5" },
    { "model": "claude-sonnet-5" }
   ],
   "why": "Cross-model review inside the Claude family. Sonnet work is reviewed by Opus; Opus work by Sonnet."
+ },
+ "second_review": {
+  "when": "Optional. The PR is risky: a Risk box other than 'None of the above' is ticked, the diff touches auth, money, a migration, or personal/privacy data, or the issue carries ready-for-human. Delete this rule to turn second reviews off.",
+  "use": [
+   { "model": "claude-fable-5-1" },
+   { "model": "claude-sonnet-5" }
+  ],
+  "why": "A second opinion from another model where a shared blind spot would cost most."
  }
 }

@@ -13,6 +13,8 @@ its commits and the issue comments, then take a different approach rather than r
 2. Read the project's `CLAUDE.md` and `AGENTS.md`; they are binding.
 3. Keep the change to what the issue asks. Out-of-scope problems you notice go in the PR body under
    "Noticed, not fixed", not in the diff.
+4. v1 is simple first: prefer the simplest change that gives a useful UI. Hardening beyond the
+   floor rules goes under "Noticed, not fixed". Floor rules, always kept: <floor rules>.
 
 ## Definition of done
 
