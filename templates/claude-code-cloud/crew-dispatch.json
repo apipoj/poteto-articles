@@ -48,7 +48,7 @@
   { "model": "claude-opus-5-5" }
  ],
  "review": {
-  "when": "Every factory PR. Pick the first model in this list that differs from the model that authored the PR's latest commits. (Alternative policy: set this to 'the first model in this list, even when it wrote the PR' and rely on the strict reviewer brief plus second_review.)",
+  "when": "Every factory PR. Pick the first model in this list that differs from the model that authored the PR's latest commits.",
   "use": [
    { "model": "claude-opus-5-5" },
    { "model": "claude-sonnet-5" }

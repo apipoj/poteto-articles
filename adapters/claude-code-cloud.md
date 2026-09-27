@@ -30,20 +30,47 @@ It can run alongside a firstmate factory on the same repo; see "Coexisting with 
 2. **`create_session` takes `model`.** The call in
    [orchestrator.md](../templates/claude-code-cloud/orchestrator.md) passes `source_url`,
    `outcome_branch`, `model`, `tags`, `title`, and `prompt`. A replacement also passes
-   `source_revision`. Checked 2026-09-27 against that call and against public Claude Code docs.
-   That call has no `effort` argument. The Messages API field `output_config.effort` is a
-   different surface. Do not add `effort` to `create_session`.
-   Inside a session, set the level with `/effort` and a level name, for example `/effort high`.
-   [Choosing the right effort level](https://academy.claude.com/tutorials/choosing-the-right-effort-level-in-claude-code) describes that command.
-   If this cloud session rejects `/effort`, say so on the issue and keep the session default.
-   Copy [templates/effort.md](../templates/effort.md) to `docs/factory/effort.md`. A chain retry
-   swaps `model`. It does not raise effort. Cloud profiles omit `effort`. After a swap, run
-   `/effort auto`. On a first session, when `/effort` is accepted, start a sketch at `low` and a
-   specified build at `medium`. Raise effort when the approach is right and the checks are thin.
-   The diff stays on the issue. Swap the model when the worker repeats the same plan.
+   `source_revision`. The call has no `effort` argument. The Messages API field
+   `output_config.effort` is a different API and does not set a Claude Code session's effort.
+   Unattended cloud sessions use the project's default effort configuration. Do not claim a
+   role-specific effort level. The template leaves `effortLevel` and `modelSettings` unset. A retry
+   changes `model` only. Copy [templates/effort.md](../templates/effort.md) to
+   `docs/factory/effort.md` for general guidance; the cloud default policy takes precedence.
 3. **Workers own delivery.** No separate pipeline exists, so the worker opens its PR and drives it
    green. It never merges, tags, deploys, or touches production.
 4. **Lower concurrency.** Start at 3 workers: each is a container plus model spend.
+
+## Human merge gate
+
+Cloud sessions use the connected GitHub identity. A prompt cannot enforce the rule that only a
+human merges. Complete the GitHub controls in [phase 0 of the cloud playbook](../playbooks/claude-code-cloud.md#phase-0-owner-prerequisites-human-only-about-10-minutes).
+Do this before enabling a Routine:
+
+- Configure branch protection or a ruleset to require human approval and checks on the default
+  branch. Restrict merge and bypass rights to human maintainers.
+- If a label triggers a merge, make the workflow verify that an approved human applied the label
+  and that tests passed on the exact PR head.
+- Use a separate automation identity without merge authority when possible.
+- Test a blocked automation merge in a test repository before enabling the factory.
+
+For defense in depth, apply
+[`worker-settings.example.json`](../templates/claude-code-cloud/worker-settings.example.json) only
+to worker sessions. It denies matching GitHub MCP merge and label-write tools through
+[`PreToolUse`](https://code.claude.com/docs/en/hooks#pretooluse-decision-control). Replace its
+matcher names with the exact tool names exposed in your environment, then test each denial. The
+example blocks every call to its listed label tools, not only merge labels. Add every label-writing
+tool your integration exposes. Do not add it to the shared project
+`.claude/settings.json` or another settings profile used by the operator. The `create_session` call
+in this kit does not select a settings file. Apply this example only if your Environment can load a
+separate worker-only profile. Otherwise, leave it unapplied rather than adding it to shared
+settings. GitHub must enforce the merge gate even if a session hook is missing or bypassed.
+
+## Skills
+
+A cloud session cannot use the operator's local `~/.claude/skills/`. Commit required skills under
+the project's `.claude/skills/` or provision account-synced skills for the Environment. Follow
+[runbook §2](../factory/runbook.md#2-install-pstack-for-workers) to keep automatic entry skills
+visible and verify discovery in a fresh cloud session.
 
 ## Environment setup
 

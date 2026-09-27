@@ -22,8 +22,17 @@ Don't proceed past this section until each of these is verifiably working (a rea
 
 pstack (Lauren Tan's rigor skills, from the articles above) needs to live where each harness looks for skills:
 
-1. Copy the skills from [github.com/cursor/plugins/tree/main/pstack/skills](https://github.com/cursor/plugins/tree/main/pstack/skills) into `~/.pi/agent/skills` and/or `~/.codex/skills`, depending on which harnesses you're using. Keep any existing same-name skill already installed there — don't overwrite local customizations blindly; diff first.
-2. For Pi specifically: open `poteto-mode/SKILL.md` and remove the `disable-model-invocation: true` line, **only in that file**. Pi hides any skill flagged that way from automatic loading, and `poteto-mode` is the entry point workers use to find the rest of pstack — if it stays hidden, workers never discover the playbooks. Leave every other pstack skill's flags alone; workers reach those by direct file path (see the standing rules below), not automatic invocation.
+1. Copy the skills from [the pstack skills directory](https://github.com/cursor/plugins/tree/main/pstack/skills) to each harness's skill location.
+   Use `~/.pi/agent/skills` for Pi, `~/.codex/skills` for Codex, and `~/.claude/skills` or the
+   project `.claude/skills` for local Claude Code. Keep any existing same-name skill. Diff before
+   replacing local changes.
+2. For Claude Code on the web, commit required skills under the project's `.claude/skills/` or provision account-synced skills for the Environment. Cloud sessions cannot read the operator's local `~/.claude/skills/`. Keep a `name` and a concrete trigger `description` in each `SKILL.md`.
+   For unattended automatic entry, remove `disable-model-invocation: true` from the copied
+   `poteto-mode` entry, or tell the worker to read that file by path. Check discovery with `/skills`
+   and a nontrivial scout prompt in a local and a fresh cloud session. See the
+   [Claude Code skills guide](https://code.claude.com/docs/en/skills) for current locations and frontmatter.
+3. For Pi specifically, open `poteto-mode/SKILL.md` and remove the `disable-model-invocation: true` line, **only in that file**. Pi hides any skill flagged that way from automatic loading, and `poteto-mode` is the entry point workers use to find the rest of pstack. Leave every other pstack skill's flags alone; workers reach those by direct file path (see the standing rules below), not automatic invocation.
+4. Claude Code can use its subagents for parallel explorer, arena, or swarm steps only when the session exposes those tools. If it does not, run the playbook in sequence and report that no subagents ran. Skip Cursor-only references and tools such as `cursor-team-kit`, `deslop`, `create-skill`, Cursor Automations, and Cursor cloud agents.
 
 ## 3. Standing worker rules
 

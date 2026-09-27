@@ -16,6 +16,20 @@ its commits and the issue comments, then take a different approach rather than r
 4. v1 is simple first: prefer the simplest change that gives a useful UI. Hardening beyond the
    floor rules goes under "Noticed, not fixed". Floor rules, always kept: <floor rules>.
 
+## Preflight gate
+
+The [`SessionStart` hook](https://code.claude.com/docs/en/hooks#sessionstart) prepares the
+container, but Claude Code continues if the hook fails.
+Before coding, confirm that `VERIFY_NATIVE_PG` is set. Then confirm that
+`pg_isready -d "$VERIFY_NATIVE_PG"` and
+`psql "$VERIFY_NATIVE_PG" -v ON_ERROR_STOP=1 -qtAc 'SELECT 1'` succeed. Run the project's
+lockfile-verified dependency install, such as `corepack pnpm install --frozen-lockfile`, and confirm
+it exits successfully. Confirm that the browser executable configured for `<verify-skill>` exists
+and is executable. For the preinstalled Chromium, check `test -x "${VERIFY_CHROMIUM:-}"`.
+
+If any preflight check fails, stop before coding and post an issue comment with the reason, ending
+with `<!-- factory:stuck -->`. Do not report the preflight as passed.
+
 ## Pipeline
 
 Work through these gates in order (the `no-mistakes` way). Each gate passes, or it produces a
@@ -33,8 +47,8 @@ question the issue does not settle) goes to the owner, never guessed.
    finding that needs a product decision, list it under **Needs owner decision**, ask on the issue,
    and open the PR as a draft.
 5. **Test.** `<check command>` passes. Then drive every Intent scenario in the running app with
-   `<verify-skill>` (the session-start hook has prepared the container). Bug fixes: reproduce
-   before the fix, prove after. Tear the instance down when finished. Fill the **Live validation**
+   `<verify-skill>` (the preflight gate has verified the container). Bug fixes: reproduce before the
+   fix, prove after. Tear the instance down when finished. Fill the **Live validation**
    table honestly: a scenario proven only by a unit test is `Live: no`; one you could not drive is
    `⏸️ untested` with the reason.
 6. **Docs.** Update what the change makes stale, or write "None" in the PR.
@@ -66,13 +80,10 @@ question the issue does not settle) goes to the owner, never guessed.
 
 ## Effort
 
-Read `docs/factory/effort.md` when it is in the repo. A higher level spends more checking inside
-the issue. The diff stays on the issue. The model stays `<MODEL>`.
-
-You can't change your own effort level: `/effort` is typed by a person, and `create_session` has
-no effort field. Your level comes from the project's `.claude/settings.json` (`effortLevel`, or
-per model in `modelSettings`). Spend the extra care the task needs through what you do instead:
-run `<verify-skill>` on every changed flow, and check the edge cases you can name.
+Read `docs/factory/effort.md` when it is in the repo for general level descriptions. Unattended
+cloud sessions use the project's default effort configuration. Do not claim a role-specific effort
+level. The shipped `.claude/settings.json` leaves effort unset. Spend the care the task needs by
+running `<verify-skill>` on every changed flow and checking the edge cases you can name.
 
 If you are repeating the same plan and not editing, stop and use the stuck path below.
 
@@ -80,4 +91,5 @@ If you are repeating the same plan and not editing, stop and use the stuck path 
 
 If two different approaches have failed, or you notice you are repeating the same plan, stop.
 Comment on the issue with what you tried and where it failed, ending with `<!-- factory:stuck -->`.
-The orchestrator replaces you with a different model on the same branch. Do not raise effort instead.
+The orchestrator replaces you with a different model on the same branch. Keep the project's default
+for effort.

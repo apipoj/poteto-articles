@@ -27,17 +27,25 @@ need_absent() {
   fi
 }
 
+need_file CLAUDE.md
 need_file templates/effort.md
 need_file templates/effort.check.sh
 need_file templates/crew-dispatch.example.json
 need_file templates/claude-code-cloud/crew-dispatch.json
 need_file templates/claude-code-cloud/worker-brief.md
 need_file templates/claude-code-cloud/orchestrator.md
+need_file templates/claude-code-cloud/reviewer-brief.md
+need_file templates/claude-code-cloud/worker-settings.example.json
+need_file templates/claude-code-cloud/settings.json
 need_file templates/brief-include.pstack.md
+need_file playbooks/claude-code-cloud.md
 need_file factory/runbook.md
 need_file adapters/claude.md
 need_file adapters/claude-code-cloud.md
 need_file templates/README.md
+
+need_phrase CLAUDE.md "@AGENTS.md"
+need_phrase CLAUDE.md "@adapters/claude.md"
 
 need_phrase templates/effort.md "does not switch models"
 need_phrase templates/effort.md "Do not raise effort"
@@ -60,26 +68,39 @@ need_phrase factory/runbook.md "templates/brief-include.pstack.md"
 need_phrase factory/runbook.md "The diff stays on the issue"
 need_phrase factory/runbook.md "captain record"
 need_absent factory/runbook.md "pstack (Lauren Tan's rigor skills) is installed for Pi and Codex."
+need_phrase factory/runbook.md "~/.claude/skills/"
+need_phrase factory/runbook.md "account-synced skills"
+need_phrase factory/runbook.md "disable-model-invocation: true"
+need_phrase factory/runbook.md "Cursor-only references"
 
 need_phrase adapters/claude.md "persist into the next session"
 need_phrase adapters/claude.md "/effort auto"
 need_phrase adapters/claude.md "CLAUDE_CODE_EFFORT_LEVEL"
+need_phrase adapters/claude.md "https://code.claude.com/docs/en/model-config"
 need_phrase adapters/claude.md "session-only"
 
-need_phrase adapters/claude-code-cloud.md "https://academy.claude.com/tutorials/choosing-the-right-effort-level-in-claude-code"
-need_phrase adapters/claude-code-cloud.md "keep the session default"
+need_phrase adapters/claude-code-cloud.md "project's default effort configuration"
+need_phrase adapters/claude-code-cloud.md "role-specific effort level"
+need_absent adapters/claude-code-cloud.md "/effort "
 need_absent adapters/claude-code-cloud.md "https://code.claude.com/docs/en/remote-control"
 
 need_phrase templates/brief-include.pstack.md "The diff stays on the issue"
 need_phrase adapters/claude.md "templates/effort.md"
 need_phrase adapters/claude-code-cloud.md "templates/effort.md"
-need_phrase adapters/claude-code-cloud.md "/effort"
 need_phrase templates/brief-include.pstack.md "templates/effort.md"
 need_phrase templates/README.md "effort.md"
-need_phrase templates/claude-code-cloud/worker-brief.md "/effort"
+need_phrase templates/README.md ".claude/hooks/cloud-session-start.sh"
+need_phrase playbooks/claude-code-cloud.md ".claude/hooks/cloud-session-start.sh"
+need_phrase templates/claude-code-cloud/worker-brief.md "project's default effort configuration"
+need_absent templates/claude-code-cloud/worker-brief.md "/effort "
 need_phrase templates/claude-code-cloud/worker-brief.md "factory:stuck"
-need_phrase templates/claude-code-cloud/worker-brief.md "Do not raise effort"
-need_phrase templates/claude-code-cloud/orchestrator.md "Do not pass \`effort\`"
+need_phrase templates/claude-code-cloud/worker-brief.md "Keep the project's default"
+need_phrase templates/claude-code-cloud/orchestrator.md "project's default effort"
+need_absent templates/claude-code-cloud/orchestrator.md "/effort "
+need_absent playbooks/claude-code-cloud.md "Same model reviewing"
+need_absent playbooks/claude-code-cloud.md "same model +"
+need_absent templates/claude-code-cloud/reviewer-brief.md "same model"
+need_absent templates/claude-code-cloud/crew-dispatch.json "Alternative policy"
 
 if grep -F -q 'No `effort` in dispatch' adapters/claude-code-cloud.md; then
   fail "adapters/claude-code-cloud.md still has the old no-effort sentence"
@@ -112,6 +133,22 @@ if not example_profiles:
     raise SystemExit("FAIL: example dispatch has no profiles")
 if not cloud_profiles:
     raise SystemExit("FAIL: cloud dispatch has no profiles")
+
+review_when = cloud.get("review", {}).get("when", "").lower()
+if "differs from the model" not in review_when or "same model" in review_when:
+    raise SystemExit("FAIL: cloud review policy must require a different model")
+
+settings = json.loads(Path("templates/claude-code-cloud/settings.json").read_text())
+worker_settings = json.loads(Path("templates/claude-code-cloud/worker-settings.example.json").read_text())
+if "PreToolUse" not in worker_settings.get("hooks", {}):
+    raise SystemExit("FAIL: worker-only settings lack a PreToolUse hook")
+if "PreToolUse" in settings.get("hooks", {}):
+    raise SystemExit("FAIL: worker-only PreToolUse hook leaked into shared settings")
+if "effortLevel" in settings or "modelSettings" in settings:
+    raise SystemExit("FAIL: cloud settings must leave effort at the project default")
+hook_command = settings["hooks"]["SessionStart"][0]["hooks"][0]["command"]
+if hook_command != '"$CLAUDE_PROJECT_DIR"/.claude/hooks/cloud-session-start.sh':
+    raise SystemExit(f"FAIL: unexpected cloud SessionStart command: {hook_command!r}")
 
 saw_effort = False
 for profile in example_profiles:
@@ -151,6 +188,7 @@ roots = [
     Path("templates/brief-include.pstack.md"),
     Path("templates/claude-code-cloud/worker-brief.md"),
     Path("templates/claude-code-cloud/orchestrator.md"),
+    Path("playbooks/claude-code-cloud.md"),
 ]
 link_re = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 missing = []

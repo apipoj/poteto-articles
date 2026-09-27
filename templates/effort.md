@@ -10,6 +10,10 @@ Copy this file next to the dispatch rules the worker will read. Firstmate uses `
 
 Extra effort reduces misses that come from missing edge cases. It does not repair a wrong approach. Start at `low` or `medium`. Do not default to `max`. Thariq Shihipar, Claude Code, 2026-09-25, [Spending your effort](https://claude.dev/blog/spending-your-effort/) and the [same post on X](https://x.com/trq212/status/2103576349499855160).
 
+Unattended Claude Code cloud sessions use the project's default effort configuration. Do not
+claim a role-specific effort level. This rule takes precedence over the interactive effort guidance
+below.
+
 ## Which level
 
 Claude Code level names are `low`, `medium`, `high`, `xhigh`, and `max`. Put those strings in the profile `effort` field when the harness can apply them. The 2026-09-25 rule of thumb names `low`, `medium`, `high`, and `max`. `xhigh` sits between `high` and `max` in Claude Code and in this kit. That post uses `xhigh` when a `low` run missed edge cases.

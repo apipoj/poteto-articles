@@ -1,14 +1,17 @@
 <!-- Append into firstmate config/brief-include.md after the stay-inside-worktree rule -->
 
-pstack (Lauren Tan's rigor skills) is installed for Pi and Codex. For any
-non-trivial ship or scout work, load the `poteto-mode` skill first and follow
-its matching playbook (bug fix, feature, refactoring, perf issue,
-investigation, prototype, visual parity). The other pstack skills it routes to
-are hidden from automatic loading; read them directly at
-`~/.pi/agent/skills/<name>/SKILL.md` (Codex: `~/.codex/skills/<name>/SKILL.md`) —
-reading those two skill folders is an allowed exception to the
-stay-inside-your-worktree rule above. Host adaptations, which override pstack
-where they conflict:
+Install pstack (Lauren Tan's rigor skills) where each harness loads skills. Pi uses
+`~/.pi/agent/skills/`. Codex uses `~/.codex/skills/`. Local Claude Code uses
+`~/.claude/skills/` or the project's `.claude/skills/`. Cloud Claude sessions need committed
+project skills or account-synced skills. They cannot use the operator's local skill folder. Install
+these skills before dispatch.
+
+For non-trivial ship or scout work, load `poteto-mode` first and follow its matching playbook (bug
+fix, feature, refactoring, perf issue, investigation, prototype, or visual parity). Read the other
+pstack skills it routes to directly from `~/.pi/agent/skills/<name>/SKILL.md`,
+`~/.codex/skills/<name>/SKILL.md`, `~/.claude/skills/<name>/SKILL.md`, or the project's
+`.claude/skills/<name>/SKILL.md`. Reading these skill folders is an allowed exception to the
+stay-inside-your-worktree rule above. Host adaptations override pstack where they conflict:
 - Pi has no subagent tool: run playbook steps yourself in sequence; where a
   step needs other models or parallel agents (arena, swarm, interrogate
   panels, parallel how/why explorers), do the single-agent version and say so
