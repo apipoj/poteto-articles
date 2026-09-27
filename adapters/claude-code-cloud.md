@@ -111,6 +111,11 @@ What we found on a real cloud container (Sept 2026):
   connector-dependent step, create the Routine from the claude.ai Routines page instead.
 - **Guard every Routine prompt** with "if that file does not exist yet, reply factory-cloud not set up yet",
   so Routines can be created before the setup PR merges.
+- **"Run now" ignores the persistent session.** `fire_trigger` (and the Routines page's run
+  button) starts a fresh session in the default environment with no repo, so the pass does
+  nothing, exactly like the fresh-session failure above. To run a pass now, create a one-shot
+  Routine (`run_once_at` a minute or two ahead) with the same `persistent_session_id`: scheduled
+  firings do land in the persistent session.
 - **Fire it once by hand** before trusting the schedule, and check its effect on GitHub (hold
   markers on the issues). You may not be able to read a fired session's transcript, so judge it by
   what it wrote.
