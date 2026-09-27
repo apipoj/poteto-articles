@@ -26,14 +26,18 @@ its commits and the issue comments, then take a different approach rather than r
    by the first commit's SHA:
    `![name](https://github.com/<owner>/<repo>/blob/<sha>/.factory-evidence/issue-<N>/<file>.png?raw=true)`.
    Squash merges keep the images off the default branch.
-4. Open the PR against the default branch. The body starts with `Fixes #<N>`, then root cause /
-   change / evidence / verification commands.
+4. Open the PR against the default branch. The body is the repo's
+   `.github/pull_request_template.md` filled in completely: `Fixes #<N>`, every section answered
+   (write "None" or "Not applicable: <reason>" rather than deleting a section), the Risk boxes
+   checked honestly, and the last line `<!-- factory:author model=<MODEL> attempt=<n> -->`. Opening
+   a PR through the API does not pre-fill the template; copy it in yourself.
 5. Subscribe to the PR's activity and drive it: fix red CI, answer every review comment. When you
    decline a finding, reply on its thread with `factory-skip: <reason>` so reviewers stop raising it.
 
 ## Never
 
 - Merge, close, approve, tag, release, or deploy. Touch production, secrets, or real databases.
+- Add or remove a label that triggers auto-merge (e.g. `merge-approved`): only a human applies it.
 - Push to any branch other than `factory/issue-<N>`.
 - Skip, disable, or weaken a test to get green.
 

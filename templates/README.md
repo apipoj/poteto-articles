@@ -9,4 +9,4 @@ Copy these into your firstmate (or equivalent orchestrator) home. Paths and abso
 | `crew-dispatch.example.json` | Start of `config/crew-dispatch.json` (edit rules) |
 | `factory-intake.check.sh` | `state/factory-intake.check.sh` + register via `check-register` |
 | `verify-maintain.check.sh` | `state/verify-maintain.check.sh` + register via `check-register` |
-| `claude-code-cloud/` | Claude Code on the web variant (no firstmate): orchestrator, briefs, dispatch rules into `docs/factory/`; `session-start.sh` + `settings.json` into `.claude/`. See [adapters/claude-code-cloud.md](../adapters/claude-code-cloud.md) |
+| `claude-code-cloud/` | Claude Code on the web variant (no firstmate): orchestrator, briefs, dispatch rules into `docs/factory/`; `session-start.sh` + `settings.json` into `.claude/`; `pull_request_template.md` into `.github/`. See [adapters/claude-code-cloud.md](../adapters/claude-code-cloud.md) |
