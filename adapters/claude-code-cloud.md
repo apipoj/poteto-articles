@@ -12,7 +12,7 @@ It can run alongside a firstmate factory on the same repo; see "Coexisting with 
 | Kit piece | Claude Code cloud |
 | --- | --- |
 | Claude Code Environment | Named **`factory-cloud`**. Routines for this kit start every session in that Environment |
-| Orchestrator (firstmate) | A **Routine** that starts a fresh session each firing (hourly) in Environment `factory-cloud` and runs one orchestrator pass ([orchestrator.md](../templates/claude-code-cloud/orchestrator.md)) |
+| Orchestrator (firstmate) | A **Routine** that fires hourly into a persistent orchestrator session created with the repo attached (Environment `factory-cloud`) and runs one orchestrator pass ([orchestrator.md](../templates/claude-code-cloud/orchestrator.md)) |
 | `factory-intake.check.sh` + `gh` | The orchestrator lists issues labeled `factory-cloud` with the **GitHub MCP tools** (cloud sessions have no `gh`) |
 | `state/.factory-intake-seen` | `<!-- factory:... -->` **marker comments** on the issue. The `factory:` prefix is a shared protocol marker, not the Environment name. Each Routine firing is a fresh container, so state must live on GitHub |
 | Worker in an isolated worktree | One **cloud session per issue** (`create_session`, `outcome_branch: factory-cloud/issue-<N>`). The container is the isolation |
@@ -74,10 +74,18 @@ What we found on a real cloud container (Sept 2026):
 
 ## Routines
 
-- **The orchestrator must not clone the repo.** A clone loads the project's `CLAUDE.md` /
-  `AGENTS.md` into context: in our test an idle pass (nothing to do) used ~99k tokens and cost
-  ~$0.57, which is ~$14/day hourly. Attach the repo with `add_repo` for GitHub tool access and read
-  the factory docs with `get_file_contents`. Workers do clone: they need the code.
+- **Fire into a session created with the repo attached, not a fresh session per firing.** A
+  fresh Routine session starts with no repo, and `add_repo` is refused by the auto-mode permission
+  check when no human is watching. The pass then runs (~76 s, ~$0.45) without ever reaching GitHub:
+  no holds, no dispatch, no error you can see. Create the orchestrator session once with
+  `create_session` and `source_url` (sparse checkout of `docs/factory`, depth 1, to keep the clone
+  small) and create the Routine with `persistent_session_id` pointing at it. Do the same for the
+  maintenance session (full clone: it runs the app). The conversation continues across firings;
+  when its context gets large, create a new session the same way and repoint the Routine.
+- **Keep the orchestrator's checkout small.** A full clone loads the project's `CLAUDE.md` /
+  `AGENTS.md` and more into context: in our test an idle pass used ~99k tokens and cost ~$0.57,
+  ~$14/day hourly. Read the factory docs with `get_file_contents`. Workers do clone fully: they
+  need the code.
 - **Fired sessions default to Sonnet**, which suits the orchestrator (it dispatches; it doesn't
   build). Workers get their model from `crew-dispatch.json` via `create_session`.
 - **Routines created from a session may store no connectors.** The factory needs only GitHub and
@@ -85,7 +93,9 @@ What we found on a real cloud container (Sept 2026):
   connector-dependent step, create the Routine from the claude.ai Routines page instead.
 - **Guard every Routine prompt** with "if that file does not exist yet, reply factory-cloud not set up yet",
   so Routines can be created before the setup PR merges.
-- **Fire it once by hand** before trusting the schedule, and read that session's last message.
+- **Fire it once by hand** before trusting the schedule, and check its effect on GitHub (hold
+  markers on the issues). You may not be able to read a fired session's transcript, so judge it by
+  what it wrote.
 
 ## Issue conventions (firstmate-style issues)
 
@@ -124,9 +134,10 @@ Firstmate polls the label `factory`. This cloud factory polls `factory-cloud`. T
    `pull_request_template.md` into `.github/`), fill the placeholders, and point the project's
    `CLAUDE.md` at them in one line.
 3. Create the GitHub intake label `factory-cloud`.
-4. Create the two Routines (hourly intake, daily maintenance) with the prompts at the end of
-   [orchestrator.md](../templates/claude-code-cloud/orchestrator.md). Ask a cloud session to create
-   them in the Environment named `factory-cloud`. Each firing starts a new session in that Environment.
+4. Create the orchestrator and maintenance sessions with the repo attached, then the two Routines
+   (hourly intake, daily maintenance) pointing at them with the prompts at the end of
+   [orchestrator.md](../templates/claude-code-cloud/orchestrator.md). Ask a cloud session in the
+   Environment named `factory-cloud` to do all four; no claude.ai UI step is needed.
 5. Dry-run one orchestrator pass by hand (no writes) against the open issues, then fire the intake
-   Routine once and read its session. Label one small issue and watch the first real pass before
-   leaving it unattended.
+   Routine once and check the hold markers it posts. Label one small issue and watch the first real
+   pass before leaving it unattended.
