@@ -89,8 +89,9 @@ For each issue to dispatch, call `create_session` with:
 - `prompt`: the contents of `docs/factory/worker-brief.md` with `<N>` and `<MODEL>` filled in
 
 If `create_session` fails for that model (unavailable, quota), try the next entry in the chain.
-Do not pass `effort` to `create_session`. The worker sets effort inside the session from
-`docs/factory/effort.md`. A chain retry changes `model` only.
+`create_session` takes no effort level, and a session can't change its own. Effort comes from the
+project's `.claude/settings.json` (`effortLevel`, or per model in `modelSettings`), so it is per
+model, not per role. A chain retry changes `model` only.
 Then post the worker dispatch marker on the issue.
 
 ## 3. Supervise workers
