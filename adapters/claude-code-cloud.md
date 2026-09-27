@@ -33,13 +33,13 @@ It can run alongside a firstmate factory on the same repo; see "Coexisting with 
    That call has no `effort` argument. The Messages API field `output_config.effort` is a
    different surface. Do not add `effort` to `create_session`.
    Inside a session, set the level with `/effort` and a level name, for example `/effort high`.
-   Web and mobile clients accept that argument form. See
-   [Remote Control](https://code.claude.com/docs/en/remote-control). If this cloud session rejects
-   `/effort`, say so on the issue and keep the session default.
+   [Choosing the right effort level](https://academy.claude.com/tutorials/choosing-the-right-effort-level-in-claude-code) describes that command.
+   If this cloud session rejects `/effort`, say so on the issue and keep the session default.
    Copy [templates/effort.md](../templates/effort.md) to `docs/factory/effort.md`. A chain retry
-   swaps `model`. It does not raise effort. After a swap, start at the level in `effort.md` for
-   this task. Raise effort when the approach is right and verification is thin. Swap the model
-   when the worker repeats the same plan.
+   swaps `model`. It does not raise effort. Cloud profiles omit `effort`. After a swap, run
+   `/effort auto`. On a first session, when `/effort` is accepted, start a sketch at `low` and a
+   specified build at `medium`. Raise effort when the approach is right and the checks are thin.
+   The diff stays on the issue. Swap the model when the worker repeats the same plan.
 3. **Workers own delivery.** No separate pipeline exists, so the worker opens its PR and drives it
    green. It never merges, tags, deploys, or touches production.
 4. **Lower concurrency.** Start at 3 workers: each is a container plus model spend.

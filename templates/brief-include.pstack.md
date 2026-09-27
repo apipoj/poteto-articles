@@ -25,7 +25,8 @@ where they conflict:
 - Keep any `show-me-your-work` decision log in your worktree, uncommitted,
   unless the brief asks for it.
 - Effort, when this harness can set it, follows the factory kit's
-  `templates/effort.md`, copied beside your dispatch rules. Effort spends
-  verification and scope. The model stays the one dispatch named. If you
-  repeat the same plan without new edits, stop. The orchestrator swaps the
-  model. Do not raise effort instead.
+  `templates/effort.md`, copied beside your dispatch rules. A higher level
+  spends more checking inside the issue. The diff stays on the issue. The
+  model stays the one dispatch named. If you repeat the same plan without
+  new edits, stop. The orchestrator swaps the model. Do not raise effort
+  instead.

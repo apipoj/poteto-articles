@@ -27,36 +27,11 @@ pstack (Lauren Tan's rigor skills, from the articles above) needs to live where 
 
 ## 3. Standing worker rules
 
-Every worker needs to know pstack is installed, how to use it, and where firstmate's own delivery contract overrides it. Put this block into firstmate's `config/brief-include.md` so it's injected into every crewmate's brief:
+Every worker needs to know pstack is installed, how to use it, and where firstmate's own delivery contract overrides it. The only copy of that standing block is [templates/brief-include.pstack.md](../templates/brief-include.pstack.md). Append that file into firstmate's `config/brief-include.md` so it is injected into every crewmate's brief. Read that file when you follow this section.
 
-```markdown
-pstack (Lauren Tan's rigor skills) is installed for Pi and Codex. For any
-non-trivial ship or scout work, load the `poteto-mode` skill first and follow
-its matching playbook (bug fix, feature, refactoring, perf issue,
-investigation, prototype, visual parity). The other pstack skills it routes to
-are hidden from automatic loading; read them directly at
-`~/.pi/agent/skills/<name>/SKILL.md` (Codex: `~/.codex/skills/<name>/SKILL.md`) —
-reading those two skill folders is an allowed exception to the
-stay-inside-your-worktree rule above. Host adaptations, which override pstack
-where they conflict:
-- Pi has no subagent tool: run playbook steps yourself in sequence; where a
-  step needs other models or parallel agents (arena, swarm, interrogate
-  panels, parallel how/why explorers), do the single-agent version and say so
-  in your report. Ignore `setup-pstack` and every Cursor-only reference
-  (cursor-team-kit, deslop, create-skill, Cursor Automations or cloud agents).
-- Wherever pstack says control-app, control-ui, or a verification skill, use
-  the project's own verification skill if it has one (e.g. the app project:
-  `verify-<app>`).
-- This brief's delivery contract wins: never open, merge, babysit, or close
-  PRs, create or clean worktrees, run `/loop`, autopilot, or orchestrate
-  playbooks, or push anything outside what this brief's Definition of done
-  allows. When no-mistakes is the delivery mode, the pipeline owns review,
-  push, PR, and CI.
-- Keep any `show-me-your-work` decision log in your worktree, uncommitted,
-  unless the brief asks for it.
-```
+The effort rule in that file is the one workers follow. When the harness can set effort, use `templates/effort.md`. A higher level spends more checking inside the issue. The diff stays on the issue. The model stays the one dispatch named. If the same plan repeats without new edits, stop. The orchestrator swaps the model. Do not raise effort instead.
 
-The "stay-inside-your-worktree rule above" this block refers to is firstmate's own standing rule already elsewhere in `brief-include.md` — a reader of this runbook alone won't have that "above" in front of them, so make sure the full brief-include file still has that rule stated before this block.
+The phrase "stay-inside-your-worktree rule above" in that file refers to firstmate's own standing rule, already elsewhere in `brief-include.md`. State that rule in the full brief-include file before the appended block.
 
 The two callouts worth reading twice: pstack's own defaults assume it's driving PRs and worktrees itself, and in this factory it never does — firstmate's delivery contract always wins that conflict. And "control-app"/"control-UI" in pstack's prose maps to *your* project's verification skill, not a generic tool pstack ships.
 
@@ -196,7 +171,7 @@ Rules to follow:
 - **If your firstmate build has typed dispatch resolution turned on, every multi-provider profile needs an explicit `"provider"` field.** Without it, the resolver can't tell which router/provider a `model` string belongs to when reconciling fallback chains across providers.
 - **If you're pointing at a custom router model catalog, every entry needs real context-window and max-output-token limits**, not placeholders. Dispatch and quota logic size prompts and truncate output against these; a wrong or missing limit either wastes context headroom or causes silent truncation mid-task.
 - Keep a `default` fallback chain for anything that matches no rule — an empty default means unmatched work has nowhere to go.
-- **`effort` is optional.** It sets how much verification and scope the worker spends. The model stays the one in `model`. Levels and the escalate loop are in [templates/effort.md](../templates/effort.md). Copy that file next to the live dispatch rules. A new rule follows `effort.md`. Do not copy `max` onto a new rule only because the example above uses it. A harness that cannot set effort ignores the field. The stuck-worker rule in §8 still applies.
+- **`effort` is optional.** It sets how much checking the worker does inside the issue. The diff stays on the issue. The model stays the one in `model`. Levels and the escalate loop are in [templates/effort.md](../templates/effort.md). Copy that file next to the live dispatch rules. When the harness can set effort, the profile `effort` wins. A new rule uses the levels in `effort.md`. The strings in the example above, and in [templates/crew-dispatch.example.json](../templates/crew-dispatch.example.json), are the captain record. Leave that snapshot alone. Do not copy `max` onto a new rule only because the snapshot has it. A harness that cannot set effort keeps the session default, and the worker writes that on the issue. The stuck-worker rule in §8 still applies.
 
 ## 5. Registering a project
 
