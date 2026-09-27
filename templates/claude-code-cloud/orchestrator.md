@@ -117,15 +117,24 @@ End the pass with a short table in your final message: issue, state, model, PR, 
 
 ## Routine prompts
 
-Intake (hourly, new session each firing):
+Each Routine fires into a **persistent session created with the repo attached** (`create_session`
+with `source_url`; the orchestrator's checkout sparse to `docs/factory`, depth 1), using
+`persistent_session_id`. Do not use a fresh session per firing: it has no repo, and `add_repo` is
+refused when no human is watching. The conversation continues across passes.
 
-> Run one orchestrator pass for `<owner>/<repo>` in the Claude Code Environment named `factory-cloud`, then stop. Attach the repo with
-> `add_repo` (access "push") for GitHub tool access, but do not clone it, even if `add_repo` says
-> to. Read `docs/factory/orchestrator.md` from the default branch with `get_file_contents` and
-> follow it exactly. If that file does not exist yet, reply "factory-cloud not set up yet" and stop.
+Intake (hourly):
 
-Maintenance (daily, pick your timezone, new session each firing):
+> Hourly orchestrator pass. You are the cloud software-factory orchestrator for `<owner>/<repo>`,
+> and this conversation continues across passes. The repo is attached to this session; do not call
+> add_repo. Re-read `docs/factory/orchestrator.md` from the default branch with `get_file_contents`
+> (it may have changed; if it does not exist yet, reply "factory-cloud not set up yet" and stop) and
+> run exactly one pass as it describes. Never merge, close, tag, release or deploy, and never add or
+> remove the auto-merge label. End with the status table only; if nothing changed, reply in one line.
 
-> Run one `<verify-skill>` maintenance pass for `<owner>/<repo>` in the Claude Code Environment named `factory-cloud`, as the skill's maintenance
-> reference describes, on branch `factory-cloud/verify-maintain-<YYYY-MM-DD>`. Open at most one PR,
-> containing only proven corrections to the skill. Report clean / changed / blocked.
+Maintenance (daily, pick your timezone):
+
+> Daily `<verify-skill>` maintenance pass for `<owner>/<repo>`; this conversation continues across
+> days. The repo is attached; do not call add_repo. Start from the latest default branch, then run
+> the skill's maintenance reference exactly, on branch `factory-cloud/verify-maintain-<YYYY-MM-DD>`.
+> Open at most one PR, containing only proven corrections to the skill. Never merge. Report
+> clean / changed / blocked.
