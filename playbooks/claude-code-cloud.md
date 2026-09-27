@@ -126,6 +126,16 @@ labeling more.
   keep Sonnet as the fallback. The reviewer is still the first model that differs from the
   author, so Sonnet reviews Opus work. This uses more of the 5-hour limit, which the monitor page
   shows.
+- **Same model reviewing (TimeFlow's choice):** the primary reviewer is Opus even on Opus work,
+  in a fresh session with none of the author's context. A strict brief makes it run lint, tests,
+  build and the verification skill itself, and name the edge cases it checked. Risky PRs (auth,
+  money, migrations, privacy) also get a `second_review` on another model (Fable 5.1, falling
+  back to Sonnet), and need both passes.
+- **Effort is per model, not per role.** `create_session` has no effort field, and a session can't
+  run `/effort` on itself. Set defaults in `.claude/settings.json` (`effortLevel`, or
+  `modelSettings: {"claude-opus-5-5": {"effort": "high"}}`). They also apply to the owner's own
+  sessions in that repo. So "code at medium, review at high" on the same model isn't possible
+  today: get the extra rigor from the reviewer brief instead.
 
 ## Known failures
 
