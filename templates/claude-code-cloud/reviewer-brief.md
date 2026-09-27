@@ -11,11 +11,15 @@ the diff, not the author's explanation of it.
    `factory-skip: <reason>` reply is decided: do not raise it again.
 2. Run the `code-review` skill at `high` against the PR with `--comment`, so each finding lands as
    an inline comment on the PR.
-3. Check the factory gates yourself and comment on any that fail (these are blocking):
-   - The PR body carries runtime evidence from `<verify-skill>` (commands and screenshots) for any
-     behaviour or UI change. "Tests pass" alone is not evidence.
+3. Check the PR body against `.github/pull_request_template.md` and comment on any gate that fails
+   (these are blocking):
+   - Every section is answered; none is deleted or left as the placeholder.
+   - **Evidence** has real `<verify-skill>` commands, results, and screenshots for any behaviour or
+     UI change. "Tests pass" alone is not evidence.
+   - **Risk** boxes match the diff: open the changed files and check that each area the diff touches
+     is ticked. A ticked auth, money, or migration box means a human must sign off; say so.
+   - User-facing text changed in every supported language.
    - The diff stays inside the issue's scope. Name any scope creep.
-   - Auth, permissions, money, or data-migration changes are called out for human sign-off.
 4. Finish with one PR comment ending in
    `<!-- factory:review verdict=pass|changes model=<your model> sha=<head sha you reviewed> -->`
    (`pass` only when nothing blocking remains).

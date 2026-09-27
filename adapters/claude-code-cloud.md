@@ -56,6 +56,32 @@ What we found on a real cloud container (Sept 2026):
 - **`list_sessions` tag filters** are not available from inside a session. Track workers through
   the session ids in your issue markers plus `get_session`.
 
+## Routines
+
+- **The orchestrator must not clone the repo.** A clone loads the project's `CLAUDE.md` /
+  `AGENTS.md` into context: in our test an idle pass (nothing to do) used ~99k tokens and cost
+  ~$0.57, which is ~$14/day hourly. Attach the repo with `add_repo` for GitHub tool access and read
+  the factory docs with `get_file_contents`. Workers do clone: they need the code.
+- **Fired sessions default to Sonnet**, which suits the orchestrator (it dispatches; it doesn't
+  build). Workers get their model from `crew-dispatch.json` via `create_session`.
+- **Routines created from a session may store no connectors.** The factory needs only GitHub and
+  the Claude Code Remote tools, not claude.ai connectors (Slack, Linear, ...). If you add a
+  connector-dependent step, create the Routine from the claude.ai Routines page instead.
+- **Guard every Routine prompt** with "if the factory docs aren't on the default branch yet, stop",
+  so Routines can be created before the setup PR merges.
+- **Fire it once by hand** before trusting the schedule, and read that session's last message.
+
+## Issue conventions (firstmate-style issues)
+
+Issues written for firstmate carry `Kind:`, `Gate:` (`held`, `hard GO`, `soft GO`, conditional),
+dependency phrases ("after S1", "blocked on the decision ticket"), and ids of reports that live in
+firstmate's local home. The template orchestrator handles each: decisions and ops never dispatch,
+dependencies wait for the other issue to close, hard and conditional gates wait for a human `GO`
+comment, and a referenced report that is not in the repo holds the issue until someone commits it
+(cloud workers only see the repo). Each hold is posted once. Dry-run the orchestrator against your
+real issue list before enabling it: ours held all nine issues for good reasons, and showed the gate
+rules were missing.
+
 ## Runtime evidence
 
 Screenshots must reach the PR, and the cloud session cannot upload images to GitHub directly.
@@ -73,10 +99,13 @@ If a firstmate factory already polls the `factory` label, give the cloud factory
 
 1. Build the project's verification skill (runbook §5) and prove its full cycle inside a cloud
    session: start, health check, one screenshot, one scripted flow, teardown.
-2. Copy the templates into the project (e.g. `docs/factory/` and `.claude/`), fill the placeholders,
-   and point the project's `CLAUDE.md` at them in one line.
+2. Copy the templates into the project (`docs/factory/`, `.claude/`, and
+   `pull_request_template.md` into `.github/`), fill the placeholders, and point the project's
+   `CLAUDE.md` at them in one line.
 3. Create the intake label.
 4. Create the two Routines (hourly intake, daily maintenance) with the prompts at the end of
    [orchestrator.md](../templates/claude-code-cloud/orchestrator.md). Ask a cloud session to create
    them; each firing starts a new session in the same environment.
-5. Label one small issue and watch the first pass before leaving it unattended.
+5. Dry-run one orchestrator pass by hand (no writes) against the open issues, then fire the intake
+   Routine once and read its session. Label one small issue and watch the first real pass before
+   leaving it unattended.
