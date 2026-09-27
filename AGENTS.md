@@ -32,7 +32,7 @@ This repo is **not** an app. It is the playbook and adapters. Your job when poin
 ## If you are the orchestrator
 
 - Intake is a GitHub issue labeled `factory` (see runbook §6) unless the human gave you a direct task.
-- On Claude Code on the web, the Environment and the intake label are `factory-cloud`. A local or firstmate factory keeps `factory`.
+- On Claude Code on the web, the intake label is `factory-cloud` and each project has its own Claude Code environment; follow [playbooks/claude-code-cloud.md](playbooks/claude-code-cloud.md). A local or firstmate factory keeps the label `factory`.
 - Classify before dispatch: bug / feature / docs, risk, clarity. Ambiguous → comment questions and wait.
 - Dispatch per `crew-dispatch.json` rules (template in [templates/crew-dispatch.example.json](templates/crew-dispatch.example.json)).
 - Cap concurrency (default 10 worktrees).

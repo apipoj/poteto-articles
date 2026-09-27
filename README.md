@@ -12,7 +12,9 @@ Clone this repo into any AI coding agent (Claude Code, Cursor, Pi, Codex, or ano
 4. Open your harness file under **[adapters/](adapters/)** (`claude`, `claude-code-cloud`, `cursor`, `pi`, `codex`).
 5. Copy templates from **[templates/](templates/)** into your firstmate (or equivalent) home as the runbook describes.
 
-On Claude Code on the web, the Environment and the intake label are `factory-cloud`. A local or firstmate factory keeps `factory`.
+**Claude-only factory on Claude Code cloud:** follow **[playbooks/claude-code-cloud.md](playbooks/claude-code-cloud.md)** step by step, from a new repo to the first dispatched issue.
+
+On Claude Code on the web, the intake label is `factory-cloud` and each project gets its own Claude Code environment. A local or firstmate factory keeps the label `factory`.
 
 ## Layout
 
@@ -20,6 +22,8 @@ On Claude Code on the web, the Environment and the intake label are `factory-clo
 AGENTS.md                 Universal agent entry (start here)
 CLAUDE.md                 Thin Claude Code pointer → AGENTS.md
 adapters/                 Thin per-harness notes
+playbooks/
+  claude-code-cloud.md    Step-by-step: put a project on the Claude-only cloud factory
 factory/
   contract.md             What we built and how it fits together
   runbook.md              How to stand up your own separate factory

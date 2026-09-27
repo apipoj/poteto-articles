@@ -2,7 +2,7 @@
 
 Copy these into your firstmate (or equivalent orchestrator) home. Paths and absolute `FM_HOME_DIR` values are yours to fill — see [factory/runbook.md](../factory/runbook.md).
 
-On Claude Code on the web, the Environment and the intake label are `factory-cloud`. A local or firstmate factory keeps `factory`.
+On Claude Code on the web, the intake label is `factory-cloud` and each project gets its own Claude Code environment. A local or firstmate factory keeps the label `factory`.
 
 | File | Goes to |
 | --- | --- |
@@ -11,4 +11,4 @@ On Claude Code on the web, the Environment and the intake label are `factory-clo
 | `crew-dispatch.example.json` | Start of `config/crew-dispatch.json` (edit rules) |
 | `factory-intake.check.sh` | `state/factory-intake.check.sh` + register via `check-register` |
 | `verify-maintain.check.sh` | `state/verify-maintain.check.sh` + register via `check-register` |
-| `claude-code-cloud/` | Claude Code on the web variant (no firstmate): orchestrator, briefs, dispatch rules into `docs/factory/`; `session-start.sh` + `settings.json` into `.claude/`; `pull_request_template.md` into `.github/`. See [adapters/claude-code-cloud.md](../adapters/claude-code-cloud.md) |
+| `claude-code-cloud/` | Claude Code on the web variant (no firstmate): orchestrator, briefs, dispatch rules into `docs/factory/`; `session-start.sh` + `settings.json` into `.claude/`; `pull_request_template.md` into `.github/`; `monitor.html` published as an Artifact (optional). Follow [playbooks/claude-code-cloud.md](../playbooks/claude-code-cloud.md) |

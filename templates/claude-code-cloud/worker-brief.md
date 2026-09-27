@@ -38,6 +38,8 @@ its commits and the issue comments, then take a different approach rather than r
 
 - Merge, close, approve, tag, release, or deploy. Touch production, secrets, or real databases.
 - Add or remove a label that triggers auto-merge (e.g. `merge-approved`): only a human applies it.
+- Post a `GO` comment or a `<!-- factory:go` marker: only the owner, or the owner's operator
+  session relaying them, gives a GO.
 - Push to any branch other than `factory-cloud/issue-<N>`.
 - Skip, disable, or weaken a test to get green.
 
