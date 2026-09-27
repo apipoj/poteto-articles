@@ -1,5 +1,6 @@
 {
  "harness": "claude-code-remote",
+ "note": "Haiku is not used: it cannot run in auto mode, so an unattended Haiku session stops at permission prompts. Small tasks use the default chain.",
  "rules": [
   {
    "when": "The task is technical product design, architecture, or planning, or new feature development with no PRD and no written plan. Do not dispatch until the captain approves on the issue.",
@@ -31,15 +32,7 @@
     { "model": "claude-sonnet-5" },
     { "model": "claude-opus-5-5" }
    ],
-   "why": "Haiku is weak in some languages (e.g. Thai); Sonnet handles every language task."
-  },
-  {
-   "when": "The task is small and well-defined and writes no non-English or user-facing text: a simple bug fix or an English docs-only change.",
-   "use": [
-    { "model": "claude-haiku-4-5-20251001" },
-    { "model": "claude-sonnet-5" }
-   ],
-   "why": "Small tasks go to the cheapest, fastest model; Sonnet takes over if Haiku gets stuck."
+   "why": "Sonnet handles every language task, including Thai."
   },
   {
    "when": "The task is the daily verification-skill maintenance pass.",
@@ -47,7 +40,7 @@
     { "model": "claude-sonnet-5" },
     { "model": "claude-opus-5-5" }
    ],
-   "why": "Multi-step pass across every feature; too broad for Haiku."
+   "why": "Multi-step pass across every feature."
   }
  ],
  "default": [
@@ -60,6 +53,6 @@
    { "model": "claude-opus-5-5" },
    { "model": "claude-sonnet-5" }
   ],
-  "why": "Cross-model review inside the Claude family. Sonnet and Haiku work is reviewed by Opus; Opus work by Sonnet."
+  "why": "Cross-model review inside the Claude family. Sonnet work is reviewed by Opus; Opus work by Sonnet."
  }
 }
