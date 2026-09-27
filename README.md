@@ -12,6 +12,8 @@ Clone this repo into any AI coding agent (Claude Code, Cursor, Pi, Codex, or ano
 4. Open your harness file under **[adapters/](adapters/)** (`claude`, `claude-code-cloud`, `cursor`, `pi`, `codex`).
 5. Copy templates from **[templates/](templates/)** into your firstmate (or equivalent) home as the runbook describes.
 
+On Claude Code on the web, the Environment and the intake label are `factory-cloud`. A local or firstmate factory keeps `factory`.
+
 ## Layout
 
 ```

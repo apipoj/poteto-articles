@@ -2,6 +2,8 @@
 
 Copy these into your firstmate (or equivalent orchestrator) home. Paths and absolute `FM_HOME_DIR` values are yours to fill — see [factory/runbook.md](../factory/runbook.md).
 
+On Claude Code on the web, the Environment and the intake label are `factory-cloud`. A local or firstmate factory keeps `factory`.
+
 | File | Goes to |
 | --- | --- |
 | `effort.md` | Effort guide for dispatch rules. Copy to `config/effort.md`, and to `docs/factory/effort.md` on the Claude Code cloud path |

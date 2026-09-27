@@ -1,7 +1,6 @@
 # Orchestrator pass
 
-<!-- Template: replace <owner>/<repo>, <label> (e.g. factory-cloud), <verify-skill>, and the
-     docs path if you keep these files somewhere other than docs/factory/. -->
+Replace `<owner>/<repo>` and `<verify-skill>` in this file before the first Routine firing. The cloud intake label is `factory-cloud`. A local or firstmate factory keeps the label `factory`. Paths below assume `docs/factory/`.
 
 You are the cloud factory orchestrator for `<owner>/<repo>`. Each Routine firing runs exactly one
 pass of the steps below, then stops. You never write product code, never merge, never tag, never
@@ -24,6 +23,8 @@ All state lives on GitHub as HTML marker comments, so every pass starts from scr
 - `<!-- factory:hold reason=<gate|dependency|decision|ops|needs-info|missing-doc> -->` posted by
   the orchestrator when it decides not to dispatch an issue yet
 
+The `<!-- factory:… -->` prefix is a shared protocol marker. It is not the Claude Environment name and it is not the intake label.
+
 Every marker comment also carries one human-readable line.
 
 **Post each hold once.** If the issue's latest `factory:hold` marker already gives the same reason
@@ -35,7 +36,7 @@ its own work), and that is newer than the latest `factory:hold` marker.
 
 ## 1. Intake
 
-List open issues labeled `<label>`. For each issue with no worker dispatch marker, apply the first
+List open issues labeled `factory-cloud`. For each issue with no worker dispatch marker, apply the first
 matching rule:
 
 1. **Decision** — the body says `Kind: decision`, or the issue asks questions only a human can
@@ -69,16 +70,16 @@ relabeling the issue.
 
 ## 2. Dispatch (cap: 3 active workers)
 
-Count active workers from the markers: for each open `<label>` issue, `get_session` on its latest
+Count active workers from the markers: for each open `factory-cloud` issue, `get_session` on its latest
 worker marker's session; `status_bucket` working or blocked counts. At 3, stop dispatching.
 
 For each issue to dispatch, call `create_session` with:
 
 - `source_url`: `https://github.com/<owner>/<repo>`
-- `outcome_branch`: `factory/issue-<N>`
+- `outcome_branch`: `factory-cloud/issue-<N>`
 - `model`: first entry of the rule's `use` chain (later entries only on retry, step 3)
-- `tags`: `["factory", "factory:issue-<N>"]`
-- `title`: `factory #<N>: <issue title>`
+- `tags`: `["factory-cloud", "factory-cloud:issue-<N>"]`
+- `title`: `factory-cloud #<N>: <issue title>`
 - `prompt`: the contents of `docs/factory/worker-brief.md` with `<N>` and `<MODEL>` filled in
 
 If `create_session` fails for that model (unavailable, quota), try the next entry in the chain.
@@ -92,19 +93,19 @@ For every issue with a worker marker and no merged PR:
 
 - Session `status_bucket` is `failed`, or a `factory:stuck` marker is newer than the last dispatch,
   or 24 h passed since dispatch with no PR → **replace, don't nudge**: dispatch a new worker with
-  the next model in the chain, `source_revision` and `outcome_branch` both `factory/issue-<N>`,
+  the next model in the chain, `source_revision` and `outcome_branch` both `factory-cloud/issue-<N>`,
   `attempt` + 1.
 - Attempt 4 would be needed, or the chain is exhausted → comment a summary, add `ready-for-human`.
 
 ## 4. Review gate
 
-For each open PR whose head branch is `factory/issue-<N>`:
+For each open PR whose head branch is `factory-cloud/issue-<N>`:
 
 - Skip while CI on the head commit is running or red (the worker owns red CI).
 - If no `factory:review` marker names the current head SHA and no reviewer dispatch for that SHA
   exists, dispatch a reviewer: `create_session` with the `review` rule's first model that differs
   from the author model in the latest worker marker, `source_revision` = the PR head branch, no
-  `outcome_branch`, tags `["factory", "factory:review"]`, prompt = `docs/factory/reviewer-brief.md`
+  `outcome_branch`, tags `["factory-cloud", "factory-cloud:review"]`, title `factory-cloud #<N>: review`, prompt = `docs/factory/reviewer-brief.md`
   with `<PR>`, `<N>`, `<AUTHOR_MODEL>` filled in. Post the reviewer dispatch marker on the issue.
 - After 4 review rounds on one PR without a `pass` → add `ready-for-human` and stop reviewing it.
 - A `pass` verdict on a green head → comment once on the issue that the PR is ready for a human
@@ -118,13 +119,13 @@ End the pass with a short table in your final message: issue, state, model, PR, 
 
 Intake (hourly, new session each firing):
 
-> Run one factory orchestrator pass for `<owner>/<repo>`, then stop. Attach the repo with
+> Run one orchestrator pass for `<owner>/<repo>` in the Claude Code Environment named `factory-cloud`, then stop. Attach the repo with
 > `add_repo` (access "push") for GitHub tool access, but do not clone it, even if `add_repo` says
 > to. Read `docs/factory/orchestrator.md` from the default branch with `get_file_contents` and
-> follow it exactly. If that file does not exist yet, reply "factory not set up yet" and stop.
+> follow it exactly. If that file does not exist yet, reply "factory-cloud not set up yet" and stop.
 
 Maintenance (daily, pick your timezone, new session each firing):
 
-> Run one `<verify-skill>` maintenance pass for `<owner>/<repo>` as the skill's maintenance
-> reference describes, on branch `factory/verify-maintain-<YYYY-MM-DD>`. Open at most one PR,
+> Run one `<verify-skill>` maintenance pass for `<owner>/<repo>` in the Claude Code Environment named `factory-cloud`, as the skill's maintenance
+> reference describes, on branch `factory-cloud/verify-maintain-<YYYY-MM-DD>`. Open at most one PR,
 > containing only proven corrections to the skill. Report clean / changed / blocked.
