@@ -1,0 +1,414 @@
+<title>PROJECT Factory Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#e9eae6;--panel:#f7f7f4;--panel-2:#eff0ec;--rule:#cfd2cb;--rule-strong:#b7bbb3;
+  --ink:#141917;--steel:#5b635e;--faint:#8b928c;
+  --signal:#d6490f;--signal-soft:#f6ddd0;--belt:#c9ccc5;--belt-mark:#b3b7af;
+  --ok:#1d7447;--ok-soft:#dcefe3;--warn:#9a5a00;--warn-soft:#f8ebcf;--bad:#b42318;--bad-soft:#f9e0dc;--run:#1f56c9;--run-soft:#dfe7fa;
+  --opus:#6b3fa0;--opus-soft:#ece3f6;--sonnet:#0f6f78;--sonnet-soft:#dcf0f1;
+  --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --sans:"IBM Plex Sans","IBM Plex Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --ground:#101311;--panel:#181c1a;--panel-2:#1f2421;--rule:#2d332f;--rule-strong:#3c433e;
+  --ink:#e8ebe6;--steel:#a2aaa4;--faint:#6f7771;
+  --signal:#ff7a3d;--signal-soft:#3a2016;--belt:#262b28;--belt-mark:#343a36;
+  --ok:#6fd49b;--ok-soft:#173022;--warn:#f1b85c;--warn-soft:#392a12;--bad:#ff8b7e;--bad-soft:#3d1c18;--run:#8eaeff;--run-soft:#1c2848;
+  --opus:#c7a4f2;--opus-soft:#2c2140;--sonnet:#6fd3db;--sonnet-soft:#133136;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#101311;--panel:#181c1a;--panel-2:#1f2421;--rule:#2d332f;--rule-strong:#3c433e;
+  --ink:#e8ebe6;--steel:#a2aaa4;--faint:#6f7771;
+  --signal:#ff7a3d;--signal-soft:#3a2016;--belt:#262b28;--belt-mark:#343a36;
+  --ok:#6fd49b;--ok-soft:#173022;--warn:#f1b85c;--warn-soft:#392a12;--bad:#ff8b7e;--bad-soft:#3d1c18;--run:#8eaeff;--run-soft:#1c2848;
+  --opus:#c7a4f2;--opus-soft:#2c2140;--sonnet:#6fd3db;--sonnet-soft:#133136;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.5 var(--sans)}
+a{color:inherit;text-decoration-color:var(--rule-strong);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--signal)}
+:focus-visible{outline:2px solid var(--signal);outline-offset:2px;border-radius:3px}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 56px}
+@media (max-width:520px){.wrap{padding-inline:16px;padding-block:18px 40px}}
+.mono{font-family:var(--mono);font-size:12px;letter-spacing:.01em}
+.label{font:500 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.14em;color:var(--steel)}
+.muted{color:var(--steel)}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* ---------- masthead ---------- */
+.mast{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px 24px;padding-bottom:18px;border-bottom:2px solid var(--ink)}
+.mast h1{font:800 clamp(38px,6.4vw,72px)/.86 var(--display);letter-spacing:.005em;text-transform:uppercase;margin:6px 0 0;text-wrap:balance}
+.mast h1 span{color:var(--signal)}
+.mast-meta{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:8px;text-align:right}
+.status-line{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.lamp{width:10px;height:10px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px var(--ok-soft)}
+.lamp.warn{background:var(--warn);box-shadow:0 0 0 4px var(--warn-soft)}
+.lamp.bad{background:var(--bad);box-shadow:0 0 0 4px var(--bad-soft)}
+.lamp.off{background:var(--faint);box-shadow:0 0 0 4px var(--panel-2)}
+button{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--rule-strong);background:var(--panel);color:var(--ink);border-radius:4px;padding:8px 12px;cursor:pointer}
+button:hover{border-color:var(--ink)}
+@media (max-width:640px){.mast-meta{align-items:flex-start;text-align:left}.status-line{justify-content:flex-start}}
+
+/* ---------- the line ---------- */
+.line{margin-top:26px;position:relative}
+.line-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.stations{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;position:relative}
+.belt{position:absolute;left:0;right:0;top:13px;height:14px;border-radius:7px;background:
+  repeating-linear-gradient(90deg,var(--belt) 0 14px,var(--belt-mark) 14px 16px);z-index:0;animation:belt 2.4s linear infinite}
+@keyframes belt{to{background-position:32px 0}}
+@media (prefers-reduced-motion:reduce){.belt{animation:none}.lamp.run-pulse{animation:none}}
+.station{position:relative;z-index:1;display:flex;flex-direction:column;gap:10px;min-width:0}
+.st-top{display:flex;flex-direction:column;align-items:flex-start;gap:6px;height:86px}
+.st-name{font:700 19px/1 var(--display);text-transform:uppercase;letter-spacing:.03em}
+.st-count{display:flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 10px;border-radius:6px;background:var(--panel);border:2px solid var(--rule-strong);font:800 24px/1 var(--display);font-variant-numeric:tabular-nums}
+.station.live .st-count{border-color:var(--signal);background:var(--signal);color:var(--panel)}
+.station.alert .st-count{border-color:var(--warn);background:var(--warn-soft);color:var(--warn)}
+.st-hint{font-size:12px;color:var(--steel);line-height:1.35;min-height:32px}
+.tokens{display:flex;flex-direction:column;gap:6px}
+.token{display:block;background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:4px;padding:7px 9px;text-decoration:none;min-width:0}
+.token:hover{border-color:var(--ink);border-left-color:var(--ink)}
+.token .t-id{display:flex;justify-content:space-between;gap:6px;font:500 12px/1.2 var(--mono)}
+.token .t-title{font-size:12.5px;line-height:1.3;margin-top:3px;color:var(--steel);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.token.gate{border-left-color:var(--warn)}
+.token.dependency{border-left-color:var(--steel)}
+.token.decision,.token.needs-human{border-left-color:var(--signal)}
+.token.ops{border-left-color:var(--bad)}
+.token.live{border-left-color:var(--run)}
+.token.ready{border-left-color:var(--ok)}
+.token.stuck{border-left-color:var(--bad)}
+.tokens.compact{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.tokens.compact .token{padding:6px 8px}
+.tokens.compact .t-id{flex-direction:column;gap:2px}
+.tokens.compact .t-title{display:none}
+@media (max-width:900px){.tokens.compact{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}}
+.empty-slot{border:1px dashed var(--rule-strong);border-radius:4px;padding:10px;font-size:12px;color:var(--faint);text-align:center}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:14px}
+.legend span{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--steel)}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+@media (max-width:900px){
+  .stations{grid-template-columns:1fr;gap:0}
+  .belt{left:19px;right:auto;top:0;bottom:0;width:6px;height:auto;background:repeating-linear-gradient(180deg,var(--belt) 0 14px,var(--belt-mark) 14px 16px)}
+  @keyframes belt{to{background-position:0 32px}}
+  .station{display:grid;grid-template-columns:40px 1fr;gap:4px 14px;padding-block:10px}
+  .st-top{display:contents}
+  .st-count{grid-column:1;grid-row:1 / span 2;align-self:start}
+  .st-name{grid-column:2;align-self:center}
+  .st-hint{grid-column:2;min-height:0}
+  .tokens{grid-column:2}
+}
+
+/* ---------- panels ---------- */
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;margin-top:30px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:18px 18px 16px;min-width:0}
+.c-7{grid-column:span 7}.c-5{grid-column:span 5}.c-12{grid-column:span 12}
+@media (max-width:900px){.c-7,.c-5{grid-column:span 12}}
+.panel h2{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:0 0 14px;font:700 22px/1 var(--display);text-transform:uppercase;letter-spacing:.03em}
+.panel h2 .label{font-weight:400}
+
+.andon{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.andon h2{color:var(--panel)}
+.andon .label{color:var(--faint)}
+.andon ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.andon li{display:grid;grid-template-columns:14px 1fr;gap:10px;align-items:start;font-size:14px;line-height:1.4}
+.andon li::before{content:"";width:10px;height:10px;margin-top:5px;border-radius:2px;background:var(--signal)}
+.andon a{color:var(--panel);text-decoration-color:var(--signal)}
+.andon .clear{color:var(--faint)}
+
+.crew{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.agent{border:1px solid var(--rule);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--panel)}
+.agent-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.agent-role{font:700 17px/1 var(--display);text-transform:uppercase;letter-spacing:.03em}
+.agent-detail{font-size:13px;color:var(--steel);line-height:1.4}
+.agent-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;font:500 11px/1 var(--mono);letter-spacing:.04em;padding:5px 8px;border-radius:999px;background:var(--panel-2);color:var(--steel);white-space:nowrap}
+.chip .d{width:7px;height:7px;border-radius:50%;background:currentColor}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}.chip.run{background:var(--run-soft);color:var(--run)}
+.chip.run .d{animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.chip.run .d{animation:none}}
+.model{font:500 11px/1 var(--mono);padding:5px 8px;border-radius:4px;letter-spacing:.03em}
+.model.opus{background:var(--opus-soft);color:var(--opus)}
+.model.sonnet{background:var(--sonnet-soft);color:var(--sonnet)}
+.model.other{background:var(--warn-soft);color:var(--warn)}
+
+.shift{display:flex;flex-direction:column;gap:14px}
+.gauge{display:flex;align-items:center;gap:16px}
+.gauge svg{flex:none}
+.gauge-big{font:800 30px/1 var(--display);text-transform:uppercase}
+.sched{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.sched-row{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:10px 0;border-bottom:1px solid var(--rule)}
+.sched-row:last-child{border-bottom:0}
+.sched-name{font-weight:600;font-size:14px}
+.sched-next{font:800 22px/1 var(--display);text-align:right;font-variant-numeric:tabular-nums}
+.sched-sub{font-size:12px;color:var(--steel)}
+
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;padding:0 10px 8px 0;border-bottom:2px solid var(--ink)}
+td{padding:11px 10px 11px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td .sub{font-size:12.5px;color:var(--steel);margin-top:3px}
+@media (max-width:640px){
+  table.stack thead{display:none}
+  table.stack tr{display:grid;gap:6px;padding:12px 0;border-bottom:1px solid var(--rule)}
+  table.stack tr:last-child{border-bottom:0}
+  table.stack td{border:0;padding:0}
+}
+.note{font-size:13px;color:var(--steel);padding:8px 0}
+.note.err{color:var(--bad)}
+footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--rule-strong);display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;font-size:12px;color:var(--steel)}
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <div class="label">OWNER/REPO · Claude-only cloud factory</div>
+      <h1>PROJECT <span>Factory</span> Floor</h1>
+    </div>
+    <div class="mast-meta">
+      <div class="status-line"><span class="lamp off" id="lamp"></span><span id="status-text" class="mono">Waiting for the first snapshot</span></div>
+      <div class="status-line"><span class="mono muted" id="clock"></span><button id="refresh" type="button">Refresh</button></div>
+    </div>
+  </header>
+
+  <section class="line" aria-label="Production line">
+    <div class="line-head">
+      <span class="label">The line · issues labeled factory-cloud, left to right</span>
+      <span class="mono muted" id="line-meta"></span>
+    </div>
+    <div class="stations" id="stations"><div class="belt" aria-hidden="true"></div></div>
+    <div class="legend" aria-label="Hold reasons">
+      <span><i style="background:var(--signal)"></i>decision / needs you</span>
+      <span><i style="background:var(--warn)"></i>gate: waits for your GO</span>
+      <span><i style="background:var(--steel)"></i>dependency</span>
+      <span><i style="background:var(--bad)"></i>ops: human-only</span>
+      <span><i style="background:var(--run)"></i>agent working</span>
+    </div>
+  </section>
+
+  <div class="grid">
+    <section class="panel andon c-5" aria-labelledby="needs-h">
+      <h2 id="needs-h">Needs you <span class="label" id="needs-count"></span></h2>
+      <div id="needs"><p class="clear">Loading…</p></div>
+    </section>
+
+    <section class="panel c-7" aria-labelledby="crew-h">
+      <h2 id="crew-h">Crew on the floor <span class="label" id="crew-meta"></span></h2>
+      <div id="crew" class="crew"></div>
+    </section>
+
+    <section class="panel c-5" aria-labelledby="shift-h">
+      <h2 id="shift-h">Shift</h2>
+      <div class="shift">
+        <div id="gauge" class="gauge"></div>
+        <div id="sched" class="sched"></div>
+      </div>
+    </section>
+
+    <section class="panel c-7" aria-labelledby="prs-h">
+      <h2 id="prs-h">Pull requests <span class="label">factory/issue-* branches</span></h2>
+      <div id="prs" class="tbl"></div>
+    </section>
+
+    <section class="panel c-12" aria-labelledby="board-h">
+      <h2 id="board-h">Issue ledger <span class="label">who acts next</span></h2>
+      <div id="board" class="tbl"></div>
+    </section>
+  </div>
+
+  <footer>
+    <span>Written by the hourly orchestrator pass and shown here as it lands. GitHub markers stay the source of truth.</span>
+    <span class="mono">Claude models only · a different model reviews each PR</span>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const REPO = "https://github.com/OWNER/REPO";
+  const TZ = "Asia/Bangkok";
+  const S = { board: null, err: null, state: "loading" };
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const arr = (v) => Array.isArray(v) ? v : [];
+  const toDate = (v) => { if (v == null || v === "") return null; const d = typeof v === "number" ? new Date(v < 1e12 ? v * 1000 : v) : new Date(v); return isNaN(d) ? null : d; };
+  const fmt = (d, o) => d ? new Intl.DateTimeFormat("en-GB", { timeZone: TZ, ...o }).format(d) : "—";
+  const hm = (d) => fmt(d, { hour: "2-digit", minute: "2-digit" });
+  const dayhm = (d) => fmt(d, { weekday: "short", hour: "2-digit", minute: "2-digit" });
+  function rel(d) {
+    if (!d) return "—";
+    const s = Math.round((Date.now() - d.getTime()) / 1000), a = Math.abs(s);
+    if (a < 60) return "just now";
+    const t = a < 3600 ? Math.round(a / 60) + " min" : a < 86400 ? Math.round(a / 3600) + " h" : Math.round(a / 86400) + " d";
+    return s < 0 ? "in " + t : t + " ago";
+  }
+  const issueUrl = (n) => `${REPO}/issues/${encodeURIComponent(n)}`;
+  const prUrl = (n) => `${REPO}/pull/${encodeURIComponent(n)}`;
+  function model(m) {
+    m = String(m || "");
+    if (/opus/.test(m)) return `<span class="model opus">${/5-5/.test(m) ? "Opus 5.5" : "Opus"}</span>`;
+    if (/sonnet/.test(m)) return `<span class="model sonnet">Sonnet 5</span>`;
+    if (/haiku/.test(m)) return `<span class="model other">Haiku · retired</span>`;
+    return m ? `<span class="model other">${esc(m)}</span>` : "";
+  }
+  const chip = (cls, t) => `<span class="chip ${cls}"><span class="d"></span>${esc(t)}</span>`;
+
+  // Stations of the line, in order.
+  const STATIONS = [
+    { key: "waiting", name: "Waiting", hint: "Held on a gate, a dependency or a decision" },
+    { key: "building", name: "Building", hint: "A worker session writes the change" },
+    { key: "review", name: "Review", hint: "A different model reviews the PR" },
+    { key: "ready", name: "Ready", hint: "Green and reviewed: your merge" },
+    { key: "shipped", name: "Shipped", hint: "Merged to main" },
+  ];
+  const STATION_OF = { hold: "waiting", "needs-human": "waiting", dispatched: "building", stuck: "building", "in-review": "review", "ready-for-merge": "ready", done: "shipped" };
+  STATIONS.unshift({ key: "intake", name: "Intake", hint: "Labeled factory-cloud, not yet read" });
+
+  function snapshotAge() { return toDate(S.board?.updatedAt); }
+
+  function renderMast() {
+    $("clock").textContent = "Bangkok " + hm(new Date());
+    const at = snapshotAge(), lamp = $("lamp"), txt = $("status-text");
+    if (!S.board) { lamp.className = "lamp off"; txt.textContent = S.state === "none" ? "Open this page on claude.ai to see the floor" : S.err ? "Couldn't load the snapshot (" + S.err + ")" : S.state === "empty" ? "No snapshot yet" : "Waiting for the first snapshot"; return; }
+    const stale = at && Date.now() - at > 2 * 3600e3;
+    const blocked = arr(S.board.agents).some((a) => a.status === "blocked" || a.status === "failed");
+    lamp.className = "lamp " + (stale ? "bad" : blocked ? "warn" : "");
+    txt.textContent = (stale ? "Snapshot stale · " : blocked ? "Line running · an agent needs attention · " : "Line running · ") + "updated " + rel(at);
+  }
+
+  function renderLine() {
+    const host = $("stations");
+    const issues = arr(S.board?.issues);
+    const shipped = arr(S.board?.shipped);
+    const buckets = Object.fromEntries(STATIONS.map((s) => [s.key, []]));
+    for (const i of issues) (buckets[STATION_OF[i.state] || "intake"]).push(i);
+    for (const p of shipped) buckets.shipped.push({ ...p, state: "done" });
+    const live = new Set(["building", "review"]);
+    $("line-meta").textContent = S.board ? `${issues.length} on the line · ${shipped.length} shipped` : "";
+    host.innerHTML = `<div class="belt" aria-hidden="true"></div>` + STATIONS.map((st) => {
+      const items = buckets[st.key];
+      const cls = items.length && live.has(st.key) ? "live" : items.length && st.key === "ready" ? "live" : items.length && st.key === "waiting" ? "alert" : "";
+      const tokens = items.length ? items.map((i) => {
+        const tcls = i.state === "hold" ? (i.reason || "") : i.state === "needs-human" ? "needs-human" : i.state === "dispatched" || i.state === "in-review" ? "live" : i.state === "ready-for-merge" || i.state === "done" ? "ready" : i.state === "stuck" ? "stuck" : "";
+        const url = i.state === "done" && i.pr ? prUrl(i.pr) : issueUrl(i.number);
+        const tag = i.state === "hold" && i.reason ? i.reason : i.state === "needs-human" ? "you" : i.pr ? "PR #" + i.pr : "";
+        return `<a class="token ${esc(tcls)}" href="${url}" target="_blank" rel="noopener" title="${esc("#" + i.number + " " + (i.title || ""))}"><span class="t-id"><span>#${esc(i.number)}</span><span class="muted">${esc(tag)}</span></span><span class="t-title">${esc(i.title || "")}</span></a>`;
+      }).join("") : `<div class="empty-slot">${S.board ? "Clear" : "—"}</div>`;
+      return `<div class="station ${cls}"><div class="st-top"><span class="st-count">${S.board ? items.length : "·"}</span><span class="st-name">${st.name}</span></div><div class="st-hint">${st.hint}</div><div class="tokens${items.length > 4 ? " compact" : ""}">${tokens}</div></div>`;
+    }).join("");
+  }
+
+  function renderNeeds() {
+    const items = [];
+    const at = snapshotAge();
+    if (at && Date.now() - at > 2 * 3600e3) items.push(`The snapshot is ${esc(rel(at))}. The hourly orchestrator pass may have stopped.`);
+    for (const a of arr(S.board?.agents)) {
+      const who = `${esc(a.role || "Agent")}${a.issue ? ` <a href="${issueUrl(a.issue)}" target="_blank" rel="noopener">#${esc(a.issue)}</a>` : ""}`;
+      if (a.status === "blocked") items.push(`${who} is blocked waiting for input.${a.session ? ` <a href="https://claude.ai/code/${esc(a.session)}" target="_blank" rel="noopener">Open session</a>` : ""}`);
+      else if (a.status === "failed") items.push(`${who} failed. The next pass replaces it.`);
+      else if (a.needs) items.push(`${who}: ${esc(a.needs)}`);
+    }
+    for (const r of arr(S.board?.routines)) {
+      if (r.enabled === false) items.push(`Routine “${esc(r.label)}” is paused.`);
+      else if (/FAILED/i.test(r.lastStatus || "")) items.push(`Routine “${esc(r.label)}” failed on its last run.`);
+    }
+    for (const n of arr(S.board?.needsHuman)) items.push(n.url ? `<a href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.text)}</a>` : esc(n.text));
+    $("needs-count").textContent = S.board ? (items.length ? items.length + " open" : "all clear") : "";
+    $("needs").innerHTML = !S.board ? `<p class="clear">Nothing to show until the first snapshot lands.</p>`
+      : items.length ? `<ul>${items.map((i) => `<li><span>${i}</span></li>`).join("")}</ul>` : `<p class="clear">Nothing needs you. The line runs on its own.</p>`;
+  }
+
+  const STATUS_CHIP = { working: ["run", "working"], blocked: ["bad", "blocked"], failed: ["bad", "failed"], review_ready: ["warn", "waiting on PR"], completed: ["", "idle"] };
+  const ROLE_ORDER = { Orchestrator: 0, Worker: 1, Reviewer: 2, Maintenance: 3 };
+  function renderCrew() {
+    const agents = arr(S.board?.agents).slice().sort((a, b) => (ROLE_ORDER[a.role] ?? 9) - (ROLE_ORDER[b.role] ?? 9) || (toDate(b.updatedAt) || 0) - (toDate(a.updatedAt) || 0));
+    const busy = agents.filter((a) => a.status === "working").length;
+    $("crew-meta").textContent = S.board ? `${agents.length} sessions · ${busy} working` : "";
+    if (!S.board) { $("crew").innerHTML = `<p class="note">Loading…</p>`; return; }
+    if (!agents.length) { $("crew").innerHTML = `<p class="note">No agent sessions in this snapshot.</p>`; return; }
+    $("crew").innerHTML = agents.map((a) => {
+      const [c, t] = STATUS_CHIP[a.status] || ["", a.status || "unknown"];
+      const target = a.role === "Worker" && a.issue ? ` <a href="${issueUrl(a.issue)}" target="_blank" rel="noopener" class="mono">#${esc(a.issue)}</a>` : a.role === "Reviewer" && a.pr ? ` <a href="${prUrl(a.pr)}" target="_blank" rel="noopener" class="mono">PR #${esc(a.pr)}</a>` : "";
+      return `<article class="agent"><div class="agent-top"><span class="agent-role">${esc(a.role || "Agent")}${target}</span>${chip(c, t)}</div>
+        <div class="agent-detail">${esc(a.needs || a.detail || "")}</div>
+        <div class="agent-foot">${model(a.model)}<span class="mono muted">${esc(rel(toDate(a.updatedAt)))}${a.session ? ` · <a href="https://claude.ai/code/${esc(a.session)}" target="_blank" rel="noopener">open</a>` : ""}</span></div></article>`;
+    }).join("");
+  }
+
+  function renderShift() {
+    const li = S.board?.limit;
+    const g = $("gauge");
+    if (!li) { g.innerHTML = `<p class="note">${S.board ? "No usage reading in this snapshot." : "Loading…"}</p>`; }
+    else {
+      const resets = toDate(li.resetsAt), ok = li.status === "allowed";
+      const past = resets && resets < Date.now();
+      const frac = resets && !past ? Math.min(1, Math.max(0, 1 - (resets - Date.now()) / (5 * 3600e3))) : 0;
+      const r = 30, C = 2 * Math.PI * r;
+      const color = ok ? "var(--ok)" : /warn/.test(li.status) ? "var(--warn)" : "var(--bad)";
+      g.innerHTML = `<svg width="76" height="76" viewBox="0 0 76 76" role="img" aria-label="Time elapsed in the 5-hour window">
+          <circle cx="38" cy="38" r="${r}" fill="none" stroke="var(--panel-2)" stroke-width="8"/>
+          <circle cx="38" cy="38" r="${r}" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${(C * frac).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 38 38)"/>
+          <text x="38" y="43" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" fill="var(--ink)">${past ? "new" : Math.round(frac * 100) + "%"}</text></svg>
+        <div><div class="label">5-hour usage window</div><div class="gauge-big" style="color:${color}">${ok ? "Within limit" : esc(String(li.status).replace(/_/g, " "))}</div>
+        <div class="sched-sub">${past ? "Window has reset since this reading" : `Resets ${esc(hm(resets))} Bangkok · ${esc(rel(resets))}`}${li.isUsingOverage ? " · using overage" : ""}</div></div>`;
+    }
+    const rs = arr(S.board?.routines);
+    $("sched").innerHTML = rs.length ? rs.map((r) => {
+      const next = toDate(r.nextRunAt), last = toDate(r.lastFiredAt);
+      const st = r.enabled === false ? chip("warn", "paused") : /FAILED/i.test(r.lastStatus || "") ? chip("bad", "last run failed") : "";
+      return `<div class="sched-row"><div><div class="sched-name">${esc(r.label)} ${st}</div><div class="sched-sub">${esc(r.when || "")} · last ${esc(last ? rel(last) : "not yet")}</div></div>
+        <div><div class="sched-next">${esc(hm(next))}</div><div class="sched-sub" style="text-align:right">${esc(next ? fmt(next, { weekday: "short" }) + " · " + rel(next) : "")}</div></div></div>`;
+    }).join("") : (S.board ? `<p class="note">No routine data in this snapshot.</p>` : "");
+  }
+
+  const CI = { green: ["ok", "CI green"], red: ["bad", "CI red"], running: ["run", "CI running"], none: ["", "no CI"] };
+  const REV = { pass: ["ok", "review pass"], changes: ["warn", "changes requested"], pending: ["run", "reviewing"], none: ["", "not reviewed"] };
+  function renderPrs() {
+    const prs = arr(S.board?.prs);
+    if (!S.board) { $("prs").innerHTML = `<p class="note">Loading…</p>`; return; }
+    if (!prs.length) { $("prs").innerHTML = `<p class="note">No open factory PRs.</p>`; return; }
+    $("prs").innerHTML = `<table class="stack"><thead><tr><th class="label">PR</th><th class="label">Checks</th><th class="label">Note</th></tr></thead><tbody>${prs.map((p) => {
+      const [cc, ct] = CI[p.ci] || ["", p.ci || "—"], [rc, rt] = REV[p.review] || ["", p.review || "—"];
+      return `<tr><td><a href="${prUrl(p.number)}" target="_blank" rel="noopener" class="mono">#${esc(p.number)}</a> ${esc(p.title || "")}${p.issue ? `<div class="sub">for <a href="${issueUrl(p.issue)}" target="_blank" rel="noopener">#${esc(p.issue)}</a></div>` : ""}</td>
+        <td><div style="display:flex;flex-wrap:wrap;gap:6px">${chip(cc, ct)}${chip(rc, rt)}</div></td><td class="sub" style="margin:0">${esc(p.note || "")}</td></tr>`;
+    }).join("")}</tbody></table>`;
+  }
+
+  const STATE_TXT = { hold: "on hold", "needs-human": "needs you", dispatched: "building", "in-review": "in review", "ready-for-merge": "ready to merge", stuck: "stuck", done: "shipped" };
+  const STATE_CHIP = { hold: "", "needs-human": "warn", dispatched: "run", "in-review": "run", "ready-for-merge": "ok", stuck: "bad", done: "ok" };
+  function renderBoard() {
+    const issues = arr(S.board?.issues);
+    if (!S.board) { $("board").innerHTML = `<p class="note">Loading…</p>`; return; }
+    if (!issues.length) { $("board").innerHTML = `<p class="note">No open factory-cloud issues.</p>`; return; }
+    $("board").innerHTML = `<table class="stack"><thead><tr><th class="label">Issue</th><th class="label">State</th><th class="label">Next</th></tr></thead><tbody>${issues.map((i) => `<tr>
+      <td><a href="${issueUrl(i.number)}" target="_blank" rel="noopener" class="mono">#${esc(i.number)}</a> ${esc(i.title || "")}</td>
+      <td><div style="display:flex;flex-wrap:wrap;gap:6px">${chip(STATE_CHIP[i.state] || "", STATE_TXT[i.state] || i.state || "—")}${i.reason ? `<span class="chip">${esc(i.reason)}</span>` : ""}</div></td>
+      <td class="muted">${esc(i.next || "")}</td></tr>`).join("")}</tbody></table>`;
+  }
+
+  function render() { renderMast(); renderLine(); renderNeeds(); renderCrew(); renderShift(); renderPrs(); renderBoard(); }
+
+  let unsub = null, dbRef = null;
+  function subscribe(db) {
+    if (unsub) unsub();
+    unsub = db.doc("factory/board").onSnapshot((snap) => {
+      if (snap.exists) { S.board = snap.data(); S.state = "ready"; S.err = null; } else { S.board = null; S.state = "empty"; }
+      render();
+    }, (e) => { S.err = e?.code || "error"; render(); });
+  }
+  $("refresh").addEventListener("click", () => { if (dbRef) { S.err = null; subscribe(dbRef); } render(); });
+
+  render();
+  setInterval(render, 30000);
+  if (!(window.claude && window.claude.use)) { S.state = "none"; render(); return; }
+  window.claude.use("db").then((db) => { if (!db) { S.state = "none"; render(); return; } dbRef = db; subscribe(db); })
+    .catch(() => { S.state = "none"; render(); });
+})();
+</script>
