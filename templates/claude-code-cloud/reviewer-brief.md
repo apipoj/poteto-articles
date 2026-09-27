@@ -24,4 +24,5 @@ the diff, not the author's explanation of it.
    `<!-- factory:review verdict=pass|changes model=<your model> sha=<head sha you reviewed> -->`
    (`pass` only when nothing blocking remains).
 
-Never push commits, approve, merge, or close. The worker fixes; a human merges.
+Never push commits, approve, merge, or close, and never add a label that triggers auto-merge. The
+worker fixes; a human merges.

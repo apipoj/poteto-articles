@@ -90,6 +90,12 @@ first commit's SHA (`https://github.com/<owner>/<repo>/blob/<sha>/<path>.png?raw
 squash merges the images never reach the default branch, and `refs/pull/<n>/head` keeps the commit
 reachable.
 
+## Auto-merge labels
+
+Cloud sessions post to GitHub as the account owner. If the project auto-merges on a label (e.g.
+`merge-approved`), any session could merge its own PR by adding it. The templates forbid every
+factory role from touching such a label; keep that line if you customise them.
+
 ## Coexisting with firstmate
 
 If a firstmate factory already polls the `factory` label, give the cloud factory its own label

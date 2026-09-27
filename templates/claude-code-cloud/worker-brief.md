@@ -37,6 +37,7 @@ its commits and the issue comments, then take a different approach rather than r
 ## Never
 
 - Merge, close, approve, tag, release, or deploy. Touch production, secrets, or real databases.
+- Add or remove a label that triggers auto-merge (e.g. `merge-approved`): only a human applies it.
 - Push to any branch other than `factory/issue-<N>`.
 - Skip, disable, or weaken a test to get green.
 
