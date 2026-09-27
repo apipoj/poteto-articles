@@ -119,9 +119,12 @@ For each open PR whose head branch is `factory-cloud/issue-<N>`:
   from the author model in the latest worker marker, `source_revision` = the PR head branch, no
   `outcome_branch`, tags `["factory-cloud", "factory-cloud:review"]`, title `factory-cloud #<N>: review`, prompt = `docs/factory/reviewer-brief.md`
   with `<PR>`, `<N>`, `<AUTHOR_MODEL>` filled in. Post the reviewer dispatch marker on the issue.
+- If `crew-dispatch.json` has a `second_review` rule and the PR matches it, also dispatch a second
+  reviewer for the same SHA the same way, with that rule's first model (fall back along its chain
+  if `create_session` refuses it).
 - After 4 review rounds on one PR without a `pass` → add `ready-for-human` and stop reviewing it.
-- A `pass` verdict on a green head → comment once on the issue that the PR is ready for a human
-  merge. Never merge it yourself.
+- A green head is ready for a human merge when every reviewer dispatched for that SHA posted
+  `pass`. Comment once on the issue that the PR is ready. Never merge it yourself.
 
 ## 5. Report
 
