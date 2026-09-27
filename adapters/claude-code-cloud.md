@@ -11,15 +11,16 @@ It can run alongside a firstmate factory on the same repo; see "Coexisting with 
 
 | Kit piece | Claude Code cloud |
 | --- | --- |
-| Orchestrator (firstmate) | A **Routine** that starts a fresh session each firing (hourly) and runs one orchestrator pass ([orchestrator.md](../templates/claude-code-cloud/orchestrator.md)) |
-| `factory-intake.check.sh` + `gh` | The orchestrator lists labeled issues with the **GitHub MCP tools** (cloud sessions have no `gh`) |
-| `state/.factory-intake-seen` | `<!-- factory:... -->` **marker comments** on the issue. Each Routine firing is a fresh container, so state must live on GitHub |
-| Worker in an isolated worktree | One **cloud session per issue** (`create_session`, `outcome_branch: factory/issue-<N>`). The container is the isolation |
+| Claude Code Environment | Named **`factory-cloud`**. Routines for this kit start every session in that Environment |
+| Orchestrator (firstmate) | A **Routine** that starts a fresh session each firing (hourly) in Environment `factory-cloud` and runs one orchestrator pass ([orchestrator.md](../templates/claude-code-cloud/orchestrator.md)) |
+| `factory-intake.check.sh` + `gh` | The orchestrator lists issues labeled `factory-cloud` with the **GitHub MCP tools** (cloud sessions have no `gh`) |
+| `state/.factory-intake-seen` | `<!-- factory:... -->` **marker comments** on the issue. The `factory:` prefix is a shared protocol marker, not the Environment name. Each Routine firing is a fresh container, so state must live on GitHub |
+| Worker in an isolated worktree | One **cloud session per issue** (`create_session`, `outcome_branch: factory-cloud/issue-<N>`). The container is the isolation |
 | `crew-dispatch.json` | [crew-dispatch.json](../templates/claude-code-cloud/crew-dispatch.json): Claude models, fallback chains in order |
 | no-mistakes pipeline | The worker runs the checks and verification, opens the PR, then **subscribes to the PR's activity** and drives CI and review comments to green |
 | Cross-family reviewer | A separate reviewer session on a **different Claude model** ([reviewer-brief.md](../templates/claude-code-cloud/reviewer-brief.md)) |
 | `verify-maintain.check.sh` | A second Routine, daily, running the project's `maintain-verification` pass |
-| Stuck worker, swap model | New session with the next model in the chain, same `factory/issue-<N>` branch as `source_revision` and `outcome_branch` |
+| Stuck worker, swap model | New session with the next model in the chain, same `factory-cloud/issue-<N>` branch as `source_revision` and `outcome_branch` |
 
 ## Deviations from the contract (say them out loud)
 
@@ -45,6 +46,8 @@ It can run alongside a firstmate factory on the same repo; see "Coexisting with 
 4. **Lower concurrency.** Start at 3 workers: each is a container plus model spend.
 
 ## Environment setup
+
+Name the Claude Code Environment `factory-cloud`. Routines for this kit start every session in that Environment.
 
 Put setup in a **repo SessionStart hook** ([session-start.sh](../templates/claude-code-cloud/session-start.sh)
 + [settings.json](../templates/claude-code-cloud/settings.json)), not only in the environment's setup
@@ -80,7 +83,7 @@ What we found on a real cloud container (Sept 2026):
 - **Routines created from a session may store no connectors.** The factory needs only GitHub and
   the Claude Code Remote tools, not claude.ai connectors (Slack, Linear, ...). If you add a
   connector-dependent step, create the Routine from the claude.ai Routines page instead.
-- **Guard every Routine prompt** with "if the factory docs aren't on the default branch yet, stop",
+- **Guard every Routine prompt** with "if that file does not exist yet, reply factory-cloud not set up yet",
   so Routines can be created before the setup PR merges.
 - **Fire it once by hand** before trusting the schedule, and read that session's last message.
 
@@ -111,8 +114,7 @@ factory role from touching such a label; keep that line if you customise them.
 
 ## Coexisting with firstmate
 
-If a firstmate factory already polls the `factory` label, give the cloud factory its own label
-(e.g. `factory-cloud`). Two orchestrators on one label dispatch the same issue twice.
+Firstmate polls the label `factory`. This cloud factory polls `factory-cloud`. Two orchestrators on one label dispatch the same issue twice.
 
 ## Setup checklist
 
@@ -121,10 +123,10 @@ If a firstmate factory already polls the `factory` label, give the cloud factory
 2. Copy the templates into the project (`docs/factory/`, `.claude/`, and
    `pull_request_template.md` into `.github/`), fill the placeholders, and point the project's
    `CLAUDE.md` at them in one line.
-3. Create the intake label.
+3. Create the GitHub intake label `factory-cloud`.
 4. Create the two Routines (hourly intake, daily maintenance) with the prompts at the end of
    [orchestrator.md](../templates/claude-code-cloud/orchestrator.md). Ask a cloud session to create
-   them; each firing starts a new session in the same environment.
+   them in the Environment named `factory-cloud`. Each firing starts a new session in that Environment.
 5. Dry-run one orchestrator pass by hand (no writes) against the open issues, then fire the intake
    Routine once and read its session. Label one small issue and watch the first real pass before
    leaving it unattended.

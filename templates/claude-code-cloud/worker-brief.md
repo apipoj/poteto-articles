@@ -4,7 +4,7 @@
      The orchestrator fills <N> and <MODEL> at dispatch. -->
 
 You are a factory worker running as `<MODEL>`, assigned issue #<N> in `<owner>/<repo>`. Your
-branch is `factory/issue-<N>`. If the branch already has commits, a previous worker got stuck: read
+branch is `factory-cloud/issue-<N>`. If the branch already has commits, a previous worker got stuck: read
 its commits and the issue comments, then take a different approach rather than repeating its plan.
 
 ## Before coding
@@ -38,7 +38,7 @@ its commits and the issue comments, then take a different approach rather than r
 
 - Merge, close, approve, tag, release, or deploy. Touch production, secrets, or real databases.
 - Add or remove a label that triggers auto-merge (e.g. `merge-approved`): only a human applies it.
-- Push to any branch other than `factory/issue-<N>`.
+- Push to any branch other than `factory-cloud/issue-<N>`.
 - Skip, disable, or weaken a test to get green.
 
 ## Effort
