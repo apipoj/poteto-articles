@@ -6,6 +6,8 @@ This is written so an agent — another Claude Code session, another firstmate i
 
 ## 1. Prerequisites
 
+> Running entirely on Claude Code on the web with Claude models only? Skip firstmate, Pi, Codex, and `gh`: follow [adapters/claude-code-cloud.md](../adapters/claude-code-cloud.md), which maps every section below onto cloud sessions and Routines.
+
 Before touching any of this, confirm you have:
 
 - **firstmate installed and bootstrapped** — [github.com/kunchenguid/firstmate](https://github.com/kunchenguid/firstmate). Follow its own setup docs first; this runbook picks up after firstmate exists and can dispatch work.

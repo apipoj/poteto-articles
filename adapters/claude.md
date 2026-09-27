@@ -2,6 +2,8 @@
 
 **Entry:** load [AGENTS.md](../AGENTS.md), then this file.
 
+Running the whole factory on Claude Code on the web (Claude models only, no firstmate)? Use [claude-code-cloud.md](claude-code-cloud.md) instead.
+
 ## Skills / rigor
 
 - Prefer Claude Code skills / project instructions for pstack equivalents when installed in the environment.

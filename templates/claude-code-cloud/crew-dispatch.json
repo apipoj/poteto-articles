@@ -1,0 +1,57 @@
+{
+ "harness": "claude-code-remote",
+ "rules": [
+  {
+   "when": "The task is technical product design, architecture, or planning, or new feature development with no PRD and no written plan. Do not dispatch until the captain approves on the issue.",
+   "use": [
+    { "model": "claude-opus-5-5" },
+    { "model": "claude-sonnet-5" }
+   ],
+   "why": "Strongest model in the factory for open-ended design."
+  },
+  {
+   "when": "The task touches auth, permissions, money, data migrations, or anything security-sensitive. Label the issue ready-for-human as well: a human must sign off before merge.",
+   "use": [
+    { "model": "claude-opus-5-5" },
+    { "model": "claude-sonnet-5" }
+   ],
+   "why": "High cost of error."
+  },
+  {
+   "when": "The task implements an already-specified feature: an issue with acceptance criteria, an existing PR, or a written plan.",
+   "use": [
+    { "model": "claude-sonnet-5" },
+    { "model": "claude-opus-5-5" }
+   ],
+   "why": "Workhorse: spec exists, so the mid-tier model does the build."
+  },
+  {
+   "when": "The task is small and well-defined: a simple bug fix, copy or i18n change, or a docs-only change.",
+   "use": [
+    { "model": "claude-haiku-4-5-20251001" },
+    { "model": "claude-sonnet-5" }
+   ],
+   "why": "Small tasks go to the cheapest, fastest model; Sonnet takes over if Haiku gets stuck."
+  },
+  {
+   "when": "The task is the daily verification-skill maintenance pass.",
+   "use": [
+    { "model": "claude-sonnet-5" },
+    { "model": "claude-opus-5-5" }
+   ],
+   "why": "Multi-step pass across every feature; too broad for Haiku."
+  }
+ ],
+ "default": [
+  { "model": "claude-sonnet-5" },
+  { "model": "claude-opus-5-5" }
+ ],
+ "review": {
+  "when": "Every factory PR. Pick the first model in this list that differs from the model that authored the PR's latest commits.",
+  "use": [
+   { "model": "claude-opus-5-5" },
+   { "model": "claude-sonnet-5" }
+  ],
+  "why": "Cross-model review inside the Claude family. Sonnet and Haiku work is reviewed by Opus; Opus work by Sonnet."
+ }
+}

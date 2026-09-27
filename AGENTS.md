@@ -9,7 +9,7 @@ This repo is **not** an app. It is the playbook and adapters. Your job when poin
 1. This file (`AGENTS.md`)
 2. [factory/contract.md](factory/contract.md) — what the factory is and how pieces fit
 3. [factory/runbook.md](factory/runbook.md) — how to stand up or operate a separate factory
-4. Your harness adapter under [adapters/](adapters/) (Claude / Cursor / Pi / Codex)
+4. Your harness adapter under [adapters/](adapters/) (Claude / Claude Code cloud / Cursor / Pi / Codex)
 5. Only then the foundational reading under [references/poteto/](references/poteto/) if you need pstack vocabulary
 
 ## Roles

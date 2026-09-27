@@ -9,7 +9,7 @@ Clone this repo into any AI coding agent (Claude Code, Cursor, Pi, Codex, or ano
 1. Read **[AGENTS.md](AGENTS.md)** (universal entry).
 2. Read **[factory/contract.md](factory/contract.md)** (architecture and operating principles).
 3. Read **[factory/runbook.md](factory/runbook.md)** when standing up or operating a factory.
-4. Open your harness file under **[adapters/](adapters/)** (`claude`, `cursor`, `pi`, `codex`).
+4. Open your harness file under **[adapters/](adapters/)** (`claude`, `claude-code-cloud`, `cursor`, `pi`, `codex`).
 5. Copy templates from **[templates/](templates/)** into your firstmate (or equivalent) home as the runbook describes.
 
 ## Layout
@@ -22,6 +22,7 @@ factory/
   contract.md             What we built and how it fits together
   runbook.md              How to stand up your own separate factory
 templates/                Dispatch rules, brief-include, intake scripts
+  claude-code-cloud/      Claude-only factory on Claude Code on the web (no firstmate)
 references/poteto/        Foundational pstack articles (© @poteto)
 .cursor/rules/            Cursor always-on pointer into this kit
 ```
