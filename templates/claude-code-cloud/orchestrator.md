@@ -95,6 +95,11 @@ For every issue with a worker marker and no merged PR:
   or 24 h passed since dispatch with no PR → **replace, don't nudge**: dispatch a new worker with
   the next model in the chain, `source_revision` and `outcome_branch` both `factory-cloud/issue-<N>`,
   `attempt` + 1.
+- The worker (per its dispatch marker) runs a model that is no longer in `crew-dispatch.json`, or
+  the session's `status_bucket` is `blocked` (waiting on a permission prompt nobody will answer)
+  → replace it the same way, with the first model of the rule that now matches. Exception: a
+  worker whose PR is open with green CI and no `changes` verdict on its head is done and only
+  waiting for review or merge; leave it, whatever its model or bucket.
 - Attempt 4 would be needed, or the chain is exhausted → comment a summary, add `ready-for-human`.
 
 ## 4. Review gate
