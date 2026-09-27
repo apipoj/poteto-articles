@@ -114,6 +114,8 @@ For every issue with a worker marker and no merged PR:
 For each open PR whose head branch is `factory-cloud/issue-<N>`:
 
 - Skip while CI on the head commit is running or red (the worker owns red CI).
+- Skip a draft PR: its worker is waiting on a **Needs owner decision** question. Put that question
+  in the monitor snapshot's `needsHuman` (if you keep a monitor page) and in your status table.
 - If no `factory:review` marker names the current head SHA and no reviewer dispatch for that SHA
   exists, dispatch a reviewer: `create_session` with the `review` rule's first model that differs
   from the author model in the latest worker marker, `source_revision` = the PR head branch, no

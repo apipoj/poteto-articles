@@ -102,6 +102,27 @@ A decision issue that is still open also holds any issue whose change it is stil
 Start with one small, doc-only issue and watch it go through dispatch, PR, review and merge before
 labeling more.
 
+## How a worker works
+
+Every worker runs the same gated pipeline, the way
+[no-mistakes](https://github.com/kunchenguid/no-mistakes) does for a local push:
+
+1. intent, with the scenarios that prove the change;
+2. build;
+3. rebase on the default branch;
+4. self-review;
+5. test, including a **Live validation** table (Scenario | Result | Live | Evidence);
+6. docs;
+7. evidence and PR, ending with a `factory:pipeline` attestation;
+8. CI.
+
+Mechanical findings get fixed. A question that changes what the product does becomes a draft PR
+with a **Needs owner decision** section, and it shows up in your needs-you list. Nothing is
+guessed. The reviewer blocks behaviour that wasn't driven live.
+
+The tool itself isn't installed in cloud sessions: it wants an interactive owner for escalations
+and runs a nested agent. The brief carries its discipline instead.
+
 ## Day to day
 
 - **Watch the monitor page's "Needs you" box.** That list is the owner's whole job.
@@ -153,6 +174,16 @@ labeling more.
 | One project's secret appears in another's worker | A shared environment | One environment per project |
 | Playwright can't find its browser | The pinned version expects a different Chromium build | `executablePath` from the SessionStart hook |
 | PR screenshots don't show | A cloud session can't upload images | Commit, link by SHA, remove in the next commit ([adapter](../adapters/claude-code-cloud.md#runtime-evidence)) |
+
+## Tools considered
+
+- **[no-mistakes](https://github.com/kunchenguid/no-mistakes):** its discipline is in the worker
+  pipeline above. The tool itself suits a person pushing from their own machine.
+- **[gh-axi](https://github.com/kunchenguid/gh-axi):** a token-efficient wrapper over the `gh` CLI
+  for agents. It needs `gh` logged in with a GitHub token. Cloud sessions have no `gh`, and a token
+  in the environment would be readable by every session's processes and would bypass the session's
+  repo scope. So keep the GitHub MCP tools in the cloud. It's a good fit for local harnesses
+  (Claude Code on a laptop, Cursor, firstmate) where `gh` is already authenticated.
 
 ## Kickoff prompt for a new project
 
