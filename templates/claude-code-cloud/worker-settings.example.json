@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^mcp__github__(merge_pull_request|enable_pull_request_auto_merge|add_issue_labels|remove_issue_label)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "printf '%s\\n' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Worker sessions may not merge pull requests or change labels.\"}}'"
+          }
+        ]
+      }
+    ]
+  }
+}

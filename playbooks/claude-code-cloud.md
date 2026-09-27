@@ -26,7 +26,16 @@ Expect one sitting to set it up, then a day of light watching before you leave i
    or another project's environment: secrets and settings leak across projects.
 2. **GitHub:** the Claude GitHub App is installed on the repo, and the repo is in the operator
    session's scope.
-3. **Decide four things up front** (you can change each later by telling the operator session):
+3. **Enforce the human merge gate before enabling the factory.** The kit cannot change GitHub
+   repository settings. Configure branch protection or a ruleset to require human approval and
+   checks on the default branch. Restrict merge or bypass rights to human maintainers. For
+   label-driven merges, make the workflow verify that an approved human applied the label. Require
+   tests to pass on the exact PR head. Use a separate automation identity without merge authority
+   when possible. Test these controls in a test repository, including a blocked automation merge.
+   The [worker-only PreToolUse example](../templates/claude-code-cloud/worker-settings.example.json)
+   is defense in depth. Test its denials if the Environment supports a worker-only settings
+   profile. Do not add it to shared operator settings.
+4. **Decide four things up front** (you can change each later by telling the operator session):
    - who merges: you do. An auto-merge label, if any, is applied only by a person;
    - the worker cap: start at 3;
    - the model policy (see [Models](#models));
@@ -38,9 +47,9 @@ Expect one sitting to set it up, then a day of light watching before you leave i
   20 seconds and a code PR runs the full suite. Don't depend on a self-hosted runner: a job queued
   for a missing runner holds its concurrency group for up to 24 hours and blocks the default
   branch.
-- **Merges stay human.** If you want one-click merges, an `auto-merge.yml` that merges only when a
-  person applied the label and the latest Tests run on that exact head passed is fine. Remember that
-  merges made with `GITHUB_TOKEN` don't trigger CI on the default branch.
+- **Merges stay human.** Apply the branch protection and actor checks from phase 0. A label-driven
+  `auto-merge.yml` must verify an approved human applied the label and that Tests passed on the
+  exact head. Merges made with `GITHUB_TOKEN` do not trigger CI on the default branch.
 - **A verification skill proven inside a cloud session** ([runbook §5](../factory/runbook.md)):
   start the app, check health, take one screenshot, run one scripted flow, tear down. Its setup
   lives in a repo SessionStart hook ([session-start.sh](../templates/claude-code-cloud/session-start.sh)),
@@ -51,18 +60,22 @@ Expect one sitting to set it up, then a day of light watching before you leave i
 ## Phase 2: install the kit (operator session, one PR)
 
 1. Copy `templates/claude-code-cloud/` into the project: the orchestrator, the briefs, and
-   `crew-dispatch.json` into `docs/factory/`; `session-start.sh` and `settings.json` into
-   `.claude/`; `pull_request_template.md` into `.github/`. Point `CLAUDE.md` at `docs/factory/` in
-   one line.
-2. Fill the placeholders:
+   `crew-dispatch.json` into `docs/factory/`; `settings.json` into `.claude/settings.json`;
+   `session-start.sh` into `.claude/hooks/cloud-session-start.sh` and make it executable with
+   `chmod +x`; and `pull_request_template.md` into `.github/`. Point `CLAUDE.md` at
+   `docs/factory/` in one line.
+2. Before enabling a Routine, check `test -x .claude/hooks/cloud-session-start.sh` in the project
+   repo, then start a fresh cloud session and complete the worker preflight in the brief. The hook
+   prepares the container but does not block a session when setup fails.
+3. Fill the placeholders:
    - `<owner>/<repo>`, `<verify-skill>`, `<check command>`, `<cap>`, `<floor rules>`;
    - `<operator-session-id>`, only if relayed GO is on;
    - `<monitor-url>` and the two trigger ids after phase 3, or delete the monitor paragraph.
-3. Write the project's floor rules into the worker and reviewer briefs: the few things v1 must
+4. Write the project's floor rules into the worker and reviewer briefs: the few things v1 must
    never break (TimeFlow's are private memory never visible to managers, money data admin-only,
    and no unnamed external model provider receiving real employee data). Everything else starts
    simple, and hardening goes under "Noticed, not fixed".
-4. Create the GitHub label `factory-cloud`. Merge the PR.
+5. Create the GitHub label `factory-cloud`. Merge the PR.
 
 ## Phase 3: start the factory (operator session)
 
@@ -147,16 +160,10 @@ and runs a nested agent. The brief carries its discipline instead.
   keep Sonnet as the fallback. The reviewer is still the first model that differs from the
   author, so Sonnet reviews Opus work. This uses more of the 5-hour limit, which the monitor page
   shows.
-- **Same model reviewing (TimeFlow's choice):** the primary reviewer is Opus even on Opus work,
-  in a fresh session with none of the author's context. A strict brief makes it run lint, tests,
-  build and the verification skill itself, and name the edge cases it checked. Risky PRs (auth,
-  money, migrations, privacy) also get a `second_review` on another model (Fable 5.1, falling
-  back to Sonnet), and need both passes.
-- **Effort is per model, not per role.** `create_session` has no effort field, and a session can't
-  run `/effort` on itself. Set defaults in `.claude/settings.json` (`effortLevel`, or
-  `modelSettings: {"claude-opus-5-5": {"effort": "high"}}`). They also apply to the owner's own
-  sessions in that repo. So "code at medium, review at high" on the same model isn't possible
-  today: get the extra rigor from the reviewer brief instead.
+- **Effort uses the project default.** Unattended cloud sessions use the project's default effort
+  configuration. Do not claim a role-specific level. The shipped `.claude/settings.json` leaves
+  `effortLevel` and `modelSettings` unset, and `create_session` has no effort field. Use the
+  reviewer brief and the project's verification skill when a task needs more scrutiny.
 
 ## Known failures
 
@@ -192,7 +199,7 @@ Open a Claude Code cloud session on the new repo, in its own environment, and pa
 > Set up the Claude-only cloud software factory for `<owner>/<repo>`, following
 > `apipoj/software-factory` `playbooks/claude-code-cloud.md` phases 1 to 3. Use environment
 > `<environment name>`. Model policy: `<kit default | all development on Opus>`. Worker cap:
-> `<n>`. Review: `<cross-model | same model + second review on risky PRs (Fable)>`. Floor rules:
+> `<n>`. Review: `<cross-model only | cross-model plus a second review on risky PRs (Fable)>`. Floor rules:
 > `<the few things v1 must never break>`. Relayed GO in chat: `<yes | no>`. Monitor page:
 > `<yes | no>`. Work through PRs, merge your own green docs and CI PRs, and ask me only for what
 > is human-only. Finish with a first pass on the open `factory-cloud` issues and tell me what
