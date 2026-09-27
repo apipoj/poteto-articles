@@ -196,6 +196,7 @@ Rules to follow:
 - **If your firstmate build has typed dispatch resolution turned on, every multi-provider profile needs an explicit `"provider"` field.** Without it, the resolver can't tell which router/provider a `model` string belongs to when reconciling fallback chains across providers.
 - **If you're pointing at a custom router model catalog, every entry needs real context-window and max-output-token limits**, not placeholders. Dispatch and quota logic size prompts and truncate output against these; a wrong or missing limit either wastes context headroom or causes silent truncation mid-task.
 - Keep a `default` fallback chain for anything that matches no rule — an empty default means unmatched work has nowhere to go.
+- **`effort` is optional.** It sets how much verification and scope the worker spends. The model stays the one in `model`. Levels and the escalate loop are in [templates/effort.md](../templates/effort.md). Copy that file next to the live dispatch rules. A new rule follows `effort.md`. Do not copy `max` onto a new rule only because the example above uses it. A harness that cannot set effort ignores the field. The stuck-worker rule in §8 still applies.
 
 ## 5. Registering a project
 

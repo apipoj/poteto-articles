@@ -37,8 +37,20 @@ its commits and the issue comments, then take a different approach rather than r
 - Push to any branch other than `factory/issue-<N>`.
 - Skip, disable, or weaken a test to get green.
 
+## Effort
+
+Read `docs/factory/effort.md` when it is in the repo. Effort spends verification and scope. The
+model stays `<MODEL>`.
+
+On Claude Code, set it with `/effort` and one of `low`, `medium`, `high`, `xhigh`, `max`. Start a
+sketch at `low` and a specified build at `medium`. Run `<verify-skill>` at `high`. Do not start at
+`max`. If `/effort` is rejected, say so on the issue and keep the session default.
+
+If the approach is right and the checks are thin, raise one level and run verification again. If
+you are repeating the same plan and not editing, do not raise effort. Use the stuck path below.
+
 ## When stuck
 
 If two different approaches have failed, or you notice you are repeating the same plan, stop.
 Comment on the issue with what you tried and where it failed, ending with `<!-- factory:stuck -->`.
-The orchestrator replaces you with a different model on the same branch.
+The orchestrator replaces you with a different model on the same branch. Do not raise effort instead.
