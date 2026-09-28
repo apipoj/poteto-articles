@@ -35,11 +35,12 @@ Expect one sitting to set it up, then a day of light watching before you leave i
    The [worker-only PreToolUse example](../templates/claude-code-cloud/worker-settings.example.json)
    is defense in depth. Test its denials if the Environment supports a worker-only settings
    profile. Do not add it to shared operator settings.
-4. **Decide four things up front** (you can change each later by telling the operator session):
+4. **Decide five things up front** (you can change each later by telling the operator session):
    - who merges: you do. An auto-merge label, if any, is applied only by a person;
    - the worker cap: start at 3;
    - the model policy (see [Models](#models));
-   - whether a `GO` you give in chat counts (see [Day to day](#day-to-day)).
+   - whether a `GO` you give in chat counts (see [Day to day](#day-to-day));
+   - when the factory runs: around the clock, or a night shift (see [Schedule](#schedule)).
 
 ## Phase 1: make the project factory-ready (operator session, through PRs)
 
@@ -90,8 +91,9 @@ Expect one sitting to set it up, then a day of light watching before you leave i
    setup check runs the SessionStart hook and `pnpm install` (or the project's equivalent), and
    confirms the database answers.
 3. **Routines**, both with `persistent_session_id`:
-   - **intake:** hourly on an off-minute (for example `37 * * * *`);
-   - **maintenance:** daily at a jittered time (for example `CRON_TZ=Asia/Bangkok 52 8 * * *`).
+   - **intake:** hourly on an off-minute, either around the clock (`37 * * * *`) or on a night
+     shift (see [Schedule](#schedule));
+   - **maintenance:** daily at a jittered time (for example `CRON_TZ=Asia/Bangkok 52 4 * * *`).
 
    Use the prompts at the end of the template orchestrator.
 4. **Monitor page (optional):** publish [monitor.html](../templates/claude-code-cloud/monitor.html)
@@ -150,6 +152,24 @@ and runs a nested agent. The brief carries its discipline instead.
 - **Move environments:** create new sessions and new Routines, then disable the old Routines.
   Workers already running finish where they are.
 
+## Schedule
+
+The orchestrator's schedule decides when new work starts: it dispatches workers and reviewers only
+during its passes.
+
+- **Around the clock:** `37 * * * *`. A GO or a green PR is picked up within the hour.
+- **Night shift** (TimeFlow's choice): hourly passes only at night, in your time zone, for example
+  `CRON_TZ=Asia/Bangkok 37 0-5,22,23 * * *` (22:37 to 05:37). Your daytime 5-hour limit stays for
+  your own work, and you wake up to PRs. Put the maintenance pass near the end of the shift
+  (`CRON_TZ=Asia/Bangkok 52 4 * * *`) so its result is ready in the morning.
+  - Workers dispatched at night finish their work, and fix their own CI, even after the shift ends.
+    Nothing new is dispatched or reviewed until the next night.
+  - A GO you give during the day waits for the shift. For something urgent, ask the operator
+    session for a one-shot pass (`run_once_at` a couple of minutes ahead).
+
+Change the schedule with `update_trigger` (`cron_expression`) from any session. Only a Routine's
+prompt is locked to the session it fires into.
+
 ## Models
 
 - **No Haiku.** It can't run in auto mode, so an unattended Haiku session stops at a permission
@@ -198,9 +218,9 @@ Open a Claude Code cloud session on the new repo, in its own environment, and pa
 
 > Set up the Claude-only cloud software factory for `<owner>/<repo>`, following
 > `apipoj/software-factory` `playbooks/claude-code-cloud.md` phases 1 to 3. Use environment
-> `<environment name>`. Model policy: `<kit default | all development on Opus>`. Worker cap:
-> `<n>`. Review: `<cross-model only | cross-model plus a second review on risky PRs (Fable)>`. Floor rules:
-> `<the few things v1 must never break>`. Relayed GO in chat: `<yes | no>`. Monitor page:
-> `<yes | no>`. Work through PRs, merge your own green docs and CI PRs, and ask me only for what
-> is human-only. Finish with a first pass on the open `factory-cloud` issues and tell me what
-> needs my GO.
+> `<environment name>`. Model policy: `<kit default | all development on Opus>`. Worker cap: `<n>`.
+> Review: `<cross-model only | cross-model plus a second review on risky PRs (Fable)>`. Floor rules:
+> `<the few things v1 must never break>`. Schedule: `<around the clock | night shift 22:00–06:00
+> <time zone>>`. Relayed GO in chat: `<yes | no>`. Monitor page: `<yes | no>`. Work through PRs,
+> merge your own green docs and CI PRs, and ask me only for what is human-only. Finish with a first
+> pass on the open `factory-cloud` issues and tell me what needs my GO.
