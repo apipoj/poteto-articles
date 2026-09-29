@@ -254,7 +254,7 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--rule-strong);
   function model(m) {
     m = String(m || "");
     if (/opus/.test(m)) return `<span class="model opus">${/5-5/.test(m) ? "Opus 5.5" : "Opus"}</span>`;
-    if (/sonnet/.test(m)) return `<span class="model sonnet">Sonnet 5</span>`;
+    if (/sonnet/.test(m)) return `<span class="model sonnet">Sonnet</span>`;
     if (/haiku/.test(m)) return `<span class="model other">Haiku · retired</span>`;
     return m ? `<span class="model other">${esc(m)}</span>` : "";
   }

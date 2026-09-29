@@ -83,7 +83,7 @@ Expect one sitting to set it up, then a day of light watching before you leave i
 1. **Orchestrator session:** `create_session` with these settings:
    - `environment_id` = the project's environment;
    - `source_url` = the repo, sparse checkout of `docs/factory`, depth 1;
-   - model `claude-sonnet-5`, `permission_mode: auto`, tag `factory:orchestrator`.
+   - model `claude-sonnet-5-5`, `permission_mode: auto`, tag `factory:orchestrator`.
 
    Its first prompt is a no-write setup check: read `orchestrator.md` with `get_file_contents`,
    list the intake issues, and report its environment id.
@@ -174,7 +174,7 @@ prompt is locked to the session it fires into.
 
 - **No Haiku.** It can't run in auto mode, so an unattended Haiku session stops at a permission
   prompt that nobody answers.
-- **Kit default:** Opus 5.5 for design and security-sensitive work, Sonnet 5 for building from a
+- **Kit default:** Opus 5.5 for design and security-sensitive work, Sonnet 5.5 for building from a
   written spec and for any non-risky task, and Sonnet for the orchestrator and maintenance.
   TimeFlow tried all-Opus for two days, then went back to this default to save limit. It kept
   user-facing Thai text on Opus.
